@@ -1,0 +1,39 @@
+<idea-plugin>
+    <id>org.queensu.logging-plugins</id>
+    <name>Logging Plugins</name>
+    <version>1.0</version>
+    <vendor email="heng.li@queensu.ca" url="hengli.org">Queen's University</vendor>
+
+    <description><![CDATA[
+    Plugins for logging improvements.<br>
+    <em>A research project.</em>
+    ]]></description>
+
+    <change-notes>Initial commit</change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+        <group id="LoggingPlugin.MainMenu" text="Logging" description="Logging options">
+            <add-to-group group-id="MainMenu" anchor="last"/>
+            <action id="LogPlugin.SearchLogging" class="searchlogging.SearchLoggingUsages" text="Search Logging" description="Search logging statements"/>
+        </group>
+    </actions>
+</idea-plugin>
