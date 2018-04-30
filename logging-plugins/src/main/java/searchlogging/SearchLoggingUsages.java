@@ -16,8 +16,11 @@ import com.intellij.usages.*;
 import com.intellij.util.Query;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
+// logger for development environment, configured in this plugin project's resources/logback.xml file
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+// logger for integrated plugin environment, configured in intellij's bin/log.xml file
+//import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,14 +28,18 @@ import java.util.List;
 
 public class SearchLoggingUsages extends AnAction {
 
-    final static Logger logger = LoggerFactory.getLogger(SearchLoggingUsages.class);
+    // slf4j logger for development environment, configured in this plugin project's resources/logback.xml file
+    private static final Logger logger = LoggerFactory.getLogger(SearchLoggingUsages.class);
+
+    // intellij logger for integrated plugin environment, configured in intellij's bin/log.xml file
+    //private static final Logger logger = Logger.getInstance(SearchLoggingUsages.class);
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) return;
         String projectName = project.getName();
-        logger.info("Start to search logging statements in project {}.", projectName);
+        logger.info("Start to search logging statements in project " + projectName +".");
 
         // get all java files in a project
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(
@@ -41,30 +48,31 @@ public class SearchLoggingUsages extends AnAction {
                 GlobalSearchScope.projectScope(project)
         );
         int nFiles = virtualFiles.size();
+        /*
         StringBuilder filenames = new StringBuilder();
         for (VirtualFile virtualFile : virtualFiles) {
             filenames.append(virtualFile.getPath() + "\n");
         }
-        logger.debug("The project {} has {} Java files, as listed below:\n{}",
-                projectName, nFiles, filenames);
+        */
+        logger.info("The project " + projectName + " has " + nFiles + " Java files.");
 
         // find all occurences of "Logger"
-        List<PsiElement> elements = new ArrayList<>();
+        //List<PsiElement> elements = new ArrayList<>();
         List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
         PsiSearchHelper.SERVICE.getInstance(project).processElementsWithWord(
                 (psiElement, offsetInElement) -> {
                     if (psiElement instanceof PsiTypeElement) {
-                        elements.add(psiElement);
+                        //elements.add(psiElement);
                         PsiElement parent = psiElement.getParent();
-                        elements.add(parent);
+                        //elements.add(parent);
                         if (parent instanceof PsiField) {
                             PsiField field = (PsiField)parent;
                             Query<PsiReference> references = ReferencesSearch.search(field);
                             for (PsiReference ref : references) {
                                 PsiElement usage = ref.getElement();
-                                elements.add(usage);
-                                elements.add(usage.getParent());
-                                elements.add(usage.getParent().getParent());
+                                //elements.add(usage);
+                                //elements.add(usage.getParent());
+                                //elements.add(usage.getParent().getParent());
 
                                 PsiElement grandparent = usage.getParent().getParent();
                                 if (grandparent instanceof PsiMethodCallExpression) {
@@ -80,19 +88,21 @@ public class SearchLoggingUsages extends AnAction {
                 UsageSearchContext.IN_CODE, true
         );
 
+        /*
         StringBuilder loggers = new StringBuilder();
         for (PsiElement element : elements) {
             loggers.append("getText(): ").append(element.getText()).append("\n");
             loggers.append("toString(): ").append(element.toString()).append("\n");
         }
+        */
 
         StringBuilder loggingStatementsStr = new StringBuilder();
         for (PsiMethodCallExpression log : loggingStatements) {
             loggingStatementsStr.append(log.getText()).append(("\n"));
         }
 
-        logger.debug("\"Logger\" occurrences: \n{}", loggers);
-        logger.debug("Logging statements: \n{}", loggingStatementsStr);
+        //logger.debug("\"Logger\" occurrences: \n{}", loggers);
+        logger.debug("Logging statements: \n" + loggingStatementsStr);
 
         /**
          * Show logging statements in the find tool window
