@@ -1,0 +1,11 @@
+1. Exception logging pattern
+
+In the logjira paper, we find that developers are confused about exception logging in many cases. They are confused about
+the whether to log, the log level, and whether to log the stack trace.
+
+We can leverage the logging-plugin to find the logging patterns for each methodCall-exception pairs.
+For example, if a openFile method call triggers an IOException, then we can look at the logging patterns for
+the openFile -> IOException scenarios. Hopefully, they should be logged similarly.
+
+We can add other metrics, such as the number of containing loops, the number of method calls in the try block,
+and whether the exception is handled.
