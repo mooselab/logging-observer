@@ -1,8 +1,10 @@
 2018-05-01 12:04:51,256 [  56161]   INFO - rchlogging.SearchLoggingUsages - Start to search logging statements in project hadoop-main.
 2018-05-01 12:05:51,967 [ 116872]   INFO - rchlogging.SearchLoggingUsages - Logging statements:
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/amrmproxy/FederationInterceptor.java:522
 LOG.warn("notifyOfResponse for policy failed for home sub-cluster "
             + this.homeSubClusterId, e)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ActiveStandbyElector.java:465
 LOG.debug("CreateNode result: " + rc + " for path: " + path
           + " connectionState: " + zkConnectionState +
@@ -12,8 +14,18 @@ LOG.debug("Running archival at time: {}", tick)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/DNS.java:268
 LOG.warn("Unable to determine hostname for interface " +
           strInterface)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/main/java/org/apache/hadoop/fs/azure/AzureNativeFileSystemStore.java:2087
 LOG.debug("{} is a folder blob.", key)
+>> logging the result of a method call
+
+if (retrieveFolderAttribute(blob)) {
+            LOG.debug("{} is a folder blob.", key);
+
+Logging-code linking:
+Similarity between log text and method call.
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-kms/src/test/java/org/apache/hadoop/crypto/key/kms/server/TestKMS.java:2135
 LOG.info("Skipping token {}", token)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/UserGroupInformation.java:1273
@@ -35,17 +47,44 @@ LOG.info("Created a Codec object of type: " + codecClass)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/DefaultContainerExecutor.java:165
 LOG.info("Copying from " + nmPrivateContainerTokensPath
         + " to " + tokenDst)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/fs/TrashPolicyDefault.java:228
 LOG.info("The configured checkpoint interval is " +
                  (emptierInterval / MSECS_PER_MINUTE) + " minutes." +
                  " Using an interval of " +
                  (deletionInterval / MSECS_PER_MINUTE) +
                  " minutes that is used for deletion instead")
+>> logging an parameter input
+Emptier(Configuration conf, long emptierInterval) throws IOException {
+      this.conf = conf;
+      this.emptierInterval = emptierInterval;
+      if (emptierInterval > deletionInterval || emptierInterval <= 0) {
+        LOG.info("The configured checkpoint interval is " +
+                 (emptierInterval / MSECS_PER_MINUTE) + " minutes." +
+                 " Using an interval of " +
+                 (deletionInterval / MSECS_PER_MINUTE) +
+                 " minutes that is used for deletion instead");
+
+Logging-code linking:
+Input parameter versus logged variable and log text.
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/src/main/java/org/apache/hadoop/yarn/server/federation/policies/FederationPolicyUtils.java:101
 LOG.warn("Failed to get policy from FederationFacade with queue "
             + queue + ": " + e.getMessage())
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/main/java/org/apache/hadoop/fs/s3a/commit/files/PendingSet.java:107
 LOG.debug("Reading pending commits in file {}", path)
+>> logging a method call
+
+LOG.debug("Reading pending commits in file {}", path);
+    PendingSet instance = serializer().load(fs, path);
+
+Insight for logging-code linking:
+Similarity with log text + variables and return type + method name + method parameters
+
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/BlockReceiver.java:1392
 LOG.info("Relaying an out of band ack of type " + oobStatus)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-nativetask/src/test/java/org/apache/hadoop/mapred/nativetask/testutil/EnforceNativeOutputCollectorDelegator.java:40
@@ -112,10 +151,25 @@ LOG.debug("Emitting metric " + name + ", type " + type + ", value " + value
 LOG.error("Fencing method " + method + " failed with an unexpected error.", t)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/TestReencryption.java:1306
 LOG.info("Waiting for queued zones for re-encryption to be {}", expected)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/main/java/org/apache/hadoop/fs/azure/NativeAzureFileSystem.java:593
 LOG.info("Unable to delete source folder during folder rename redo. "
               + "If the source folder is already gone, this is not an error "
               + "condition. Continuing with redo.", e)
+>> logging an exception triggered by a method declearing the exception
+  // Now we can safely delete the source folder.
+          fs.getStoreInterface().delete(srcKey, lease); // throws IOException
+        } catch (Exception e) {
+          LOG.info("Unable to delete source folder during folder rename redo. "
+              + "If the source folder is already gone, this is not an error "
+              + "condition. Continuing with redo.", e);
+        }
+Logging-code linking:
+1. Logged exception versus the exceptions in tried methods' throws clauses (note for abstract exceptions, e.g., Exception)
+2. If there are multiple methods throws the same exception, rank them by their similarity with the log text.
+
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/federation/router/PeriodicService.java:183
 LOG.warn(serviceName + " service threw an exception", ex)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/io/SequenceFile.java:3553
@@ -128,11 +182,22 @@ LOG.info("Spilling map output")
 LOG.info("NumAllocatedContainers is " + numAllocatedContainers.get()
             + " and NumRequestedContainers is " + numAllocatedContainers.get()
             + ".Application Master failed. exiting")
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/fs/FileSystem.java:3326
 LOGGER.debug("Looking in service filesystems for implementation class")
+>> logging a method call
+      LOGGER.debug("Looking in service filesystems for implementation class");
+      clazz = SERVICE_FILE_SYSTEMS.get(scheme);
+Logging-code linking:
+Similarity between log text and object name
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/conf/ReconfigurationServlet.java:65
 LOG.info("getting attribute: " + CONF_SERVLET_RECONFIGURABLE_PREFIX +
              req.getServletPath())
+>> logging a method call
+Logging-code linking:
+Similarity between log text + log variable and method name + method parameters.
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestMaintenanceState.java:1064
 LOG.info(output)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ErasureCodingPolicyManager.java:275
@@ -144,13 +209,30 @@ LOG.warn("Unable to wrap exception of type " +
 LOG.warn("BR lease 0x{} is not valid for DN {}, because the DN " +
                "is not in the pending set.",
                Long.toHexString(id), dn.getDatanodeUuid())
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/test/java/org/apache/hadoop/fs/s3a/scale/ITestS3ADirectoryPerformance.java:185
 LOG.info("Time per call: {}", toHuman(timer.nanosPerOperation(attempts)))
+>> test file logging (to be ignored)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/src/main/java/org/apache/hadoop/yarn/server/timeline/RollingLevelDBTimelineStore.java:1064
 LOG.error("Error putting entity " + entity.getEntityId() + " of type "
           + entity.getEntityType(), e)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/test/java/org/apache/hadoop/fs/azure/AzureBlobStorageTestAccount.java:530
 LOG.warn("Skipping live Azure test because of missing test account")
+>> logging a missing configuration
+
+String testAccountName = conf.get(TEST_ACCOUNT_NAME_PROPERTY_NAME);
+    if (testAccountName == null) {
+      LOG.warn("Skipping live Azure test because of missing test account");
+      return null;
+    }
+
+Insight for logging-code configuration:
+Similarity between log text and configuration name.
+Trace back from checked value to configuration name (e.g., Configuration.Property).
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/TestReencryptionHandler.java:194
 LOG.info("Throttle completed, consumed {}", sw.now(TimeUnit.MILLISECONDS))
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestDecommission.java:1220
@@ -160,14 +242,43 @@ LOG.debug("skip {}", n)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services-api/src/main/java/org/apache/hadoop/yarn/service/webapp/ApiServerWebApp.java:154
 logger.info("War = {}", Collections
           .singletonList(apiServer.getWebAppContext().getWar()))
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/main/java/org/apache/hadoop/fs/s3a/S3AFileSystem.java:2401
 LOG.info("Interrupted: aborting upload")
+
+>> logging an exception triggered by a method call which declares the exception, as well as the exception handling strategy
+
+try {
+      UploadResult result = upload.waitForUploadResult();
+      incrementPutCompletedStatistics(true, uploadInfo.getLength());
+      return result;
+    } catch (InterruptedException e) {
+      LOG.info("Interrupted: aborting upload");
+      incrementPutCompletedStatistics(false, uploadInfo.getLength());
+      upload.abort();
+
+Insight for linking logging-code:
+Match the caught exception with the exceptions that are declared in the "tried" methods' throws clauses
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/main/java/org/apache/hadoop/mapreduce/v2/app/job/impl/TaskAttemptImpl.java:985
 LOG.info("The job-jar file on the remote FS is "
           + remoteJobJar.toUri().toASCIIString())
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-auth/src/main/java/org/apache/hadoop/security/authentication/util/ZKSignerSecretProvider.java:368
 LOG.info("Connecting to ZooKeeper with SASL/Kerberos"
               + "and using 'sasl' ACLs")
+>> logging the return value of a method call
+
+String authType = config.getProperty(ZOOKEEPER_AUTH_TYPE, "none");
+    if (authType.equals("sasl")) {
+      LOG.info("Connecting to ZooKeeper with SASL/Kerberos"
+              + "and using 'sasl' ACLs");
+
+Insight for logging-code linking:
+Similarity between log text and method call parameters (special for getProperty or similar method calls) + checked value.
+
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/io/compress/zlib/ZlibFactory.java:59
 LOG.info("Successfully loaded & initialized native-zlib library")
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/TestSequenceFile.java:388
@@ -211,8 +322,11 @@ LOG.warn("Exception running local (uberized) 'child' : "
 LOG.error("Cannot create directory {}", dir.getAbsoluteFile())
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockPlacementPolicyRackFaultTolerant.java:148
 LOG.debug("Caught exception was:", e)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-auth/src/main/java/org/apache/hadoop/security/authentication/server/KerberosAuthenticationHandler.java:272
 LOG.trace("SPNEGO starting for url: {}", request.getRequestURL())
+>> logging the starting of an authentication process
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/src/test/java/org/apache/hadoop/yarn/server/applicationhistoryservice/TestFileSystemApplicationHistoryStore.java:99
 LOG.info("Starting testReadWriteHistoryData")
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/src/test/java/org/apache/hadoop/mapreduce/TestValueIterReset.java:292
@@ -226,19 +340,52 @@ LOG.debug("Using schema-specific factory for {}", outputPath)
 LOG.warn("interrupted while sleeping", ie)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/src/main/java/org/apache/hadoop/yarn/server/federation/store/impl/ZookeeperFederationStateStore.java:344
 LOG.warn("The queried SubCluster: {} does not exist.", subClusterId)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-auth/src/main/java/org/apache/hadoop/security/authentication/util/KerberosName.java:401
 LOG.info("No auth_to_local rules applied to {}", this)
+>> logging the return value of a method call:
+
+    for(Rule r: rules) {
+      String result = r.apply(params);
+      if (result != null) {
+        return result;
+      }
+    }
+
+    LOG.info("No auth_to_local rules applied to {}", this);
+
+    Insight for logging-code linking:
+
+    Similarity between log text and qualified method call, i.e., ClassName.methodName (e.g., Rule.apply)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/snapshot/TestSnapshotDiffReport.java:194
 LOG.info(report.toString())
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-examples/src/main/java/org/apache/hadoop/examples/terasort/TeraScheduler.java:158
 LOG.debug("  examine: " + cur.filename + " " + cur.locations.size())
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/main/java/org/apache/hadoop/fs/s3a/S3AFileSystem.java:591
 LOG.debug("Setting input strategy: {}", inputPolicy)
+>> logging method functionality
+
+ public void setInputPolicy(S3AInputPolicy inputPolicy) {
+    Objects.requireNonNull(inputPolicy, "Null inputStrategy");
+    LOG.debug("Setting input strategy: {}", inputPolicy);
+    this.inputPolicy = inputPolicy;
+  }
+
+Insight for logging-code linking:
+Similarity between log text + variable and method name + parameters
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/token/delegation/AbstractDelegationTokenSecretManager.java:490
 LOG.info("Token renewal for identifier: " + formatTokenId(id)
         + "; total currentTokens " +  currentTokens.size())
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/conf/TestConfigurationFieldsBase.java:652
 LOG.info("\n")
+>> logging a new line (might be a anti-pattern)
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs-client/src/main/java/org/apache/hadoop/hdfs/FileChecksumHelper.java:485
 LOG.debug("Got access token error in response to OP_BLOCK_CHECKSUM "
                     + "for file {} for block {} from datanode {}. Will retry "
