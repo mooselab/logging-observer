@@ -9,19 +9,19 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethodCallExpression;
 import org.jetbrains.annotations.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 // logger for integrated plugin environment, configured in intellij's bin/log.xml file
-//import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.*;
 
 public class SampleLoggingUsages extends AnAction {
     // slf4j logger for development environment, configured in this plugin project's resources/logback.xml file
-    private static final Logger logger = LoggerFactory.getLogger(SampleLoggingUsages.class);
+    //private static final Logger logger = LoggerFactory.getLogger(SampleLoggingUsages.class);
 
     // intellij logger for integrated plugin environment, configured in intellij's bin/log.xml file
-    //private static final Logger logger = Logger.getInstance(SearchLoggingUsages.class);
+    private static final Logger logger = Logger.getInstance(SearchLoggingUsages.class);
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = event.getProject();
@@ -47,7 +47,7 @@ public class SampleLoggingUsages extends AnAction {
             loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
             loggingStatementsStr.append(log.getText()).append(("\n"));
         }
-        logger.debug("Logging statements: \n" + loggingStatementsStr);
+        logger.info("Logging statements: \n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, sampledLogs);

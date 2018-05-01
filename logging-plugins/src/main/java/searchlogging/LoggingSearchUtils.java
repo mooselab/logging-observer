@@ -11,23 +11,41 @@ import com.intellij.usages.*;
 import com.intellij.util.Query;
 import org.jetbrains.annotations.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class LoggingSearchUtils {
+    private static final Logger logger = LoggerFactory.getLogger(SearchLoggingUsages.class);
     /**
      * Find logging statements in a Java project, excluding those in test files
      * @param project
      * @return
      */
-    //TODO: exlude logging statements in test files, like "BDBHAVirtualHostNodeTest.java"
     public static List<PsiMethodCallExpression> findLoggingStatementsInProject(Project project) {
         // find all occurences of "Logger"
         //List<PsiElement> elements = new ArrayList<>();
+
         List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
         PsiSearchHelper.SERVICE.getInstance(project).processElementsWithWord(
                 (psiElement, offsetInElement) -> {
                     if (psiElement instanceof PsiTypeElement) {
+                        // exclude test files
+                        // TODO: compile regex pattern first, to improve performance
+                        PsiFile psiFile = psiElement.getContainingFile();
+                        String fileName = psiFile.getName();
+                        boolean isJavaFile = false, isTestFile = false;
+                        if (fileName.matches(".*\\.java")) {
+                            isJavaFile = true;
+                            if (fileName.matches(".*Test\\.java")) {
+                                isTestFile = true;
+                            }
+                        }
+                        if (!isJavaFile || isTestFile) return true;
+//                        logger.debug("File name: " + psiFile.getName() + ", type: " + psiFile.getFileType().getName() +
+//                                ", isJavaFile: " + isJavaFile + ", isTestFile: " + isTestFile);
                         //elements.add(psiElement);
                         PsiElement parent = psiElement.getParent();
                         //elements.add(parent);

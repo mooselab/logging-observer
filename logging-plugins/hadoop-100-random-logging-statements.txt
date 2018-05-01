@@ -1,0 +1,247 @@
+2018-05-01 12:04:51,256 [  56161]   INFO - rchlogging.SearchLoggingUsages - Start to search logging statements in project hadoop-main.
+2018-05-01 12:05:51,967 [ 116872]   INFO - rchlogging.SearchLoggingUsages - Logging statements:
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/amrmproxy/FederationInterceptor.java:522
+LOG.warn("notifyOfResponse for policy failed for home sub-cluster "
+            + this.homeSubClusterId, e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ActiveStandbyElector.java:465
+LOG.debug("CreateNode result: " + rc + " for path: " + path
+          + " connectionState: " + zkConnectionState +
+          "  for " + this)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/src/main/java/org/apache/hadoop/yarn/server/resourcemanager/reservation/InMemoryPlan.java:477
+LOG.debug("Running archival at time: {}", tick)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/DNS.java:268
+LOG.warn("Unable to determine hostname for interface " +
+          strInterface)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/main/java/org/apache/hadoop/fs/azure/AzureNativeFileSystemStore.java:2087
+LOG.debug("{} is a folder blob.", key)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-kms/src/test/java/org/apache/hadoop/crypto/key/kms/server/TestKMS.java:2135
+LOG.info("Skipping token {}", token)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/UserGroupInformation.java:1273
+LOG.warn("Warning, no kerberos ticket found while attempting to renew ticket")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/src/main/java/org/apache/hadoop/mapred/MapTask.java:1191
+LOG.info("Record too large for in-memory buffer: " + e.getMessage())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/mover/TestMover.java:898
+LOG.info("Simulate block pinning in datanode {}", datanodeInfo)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSNamesystem.java:3631
+LOG.info("commitBlockSynchronization(" + oldBlock + ") successful")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs-httpfs/src/main/java/org/apache/hadoop/lib/server/Server.java:362
+log.info("    Version           : {}", serverInfo.getProperty(name + ".version", "undef"))
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/FSEditLog.java:774
+LOG.info(buf.toString())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/token/DtFileOperations.java:200
+LOG.info("Add token with service " + alias)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/compress/TestCodec.java:191
+LOG.info("Created a Codec object of type: " + codecClass)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/DefaultContainerExecutor.java:165
+LOG.info("Copying from " + nmPrivateContainerTokensPath
+        + " to " + tokenDst)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/fs/TrashPolicyDefault.java:228
+LOG.info("The configured checkpoint interval is " +
+                 (emptierInterval / MSECS_PER_MINUTE) + " minutes." +
+                 " Using an interval of " +
+                 (deletionInterval / MSECS_PER_MINUTE) +
+                 " minutes that is used for deletion instead")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/src/main/java/org/apache/hadoop/yarn/server/federation/policies/FederationPolicyUtils.java:101
+LOG.warn("Failed to get policy from FederationFacade with queue "
+            + queue + ": " + e.getMessage())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/main/java/org/apache/hadoop/fs/s3a/commit/files/PendingSet.java:107
+LOG.debug("Reading pending commits in file {}", path)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/BlockReceiver.java:1392
+LOG.info("Relaying an out of band ack of type " + oobStatus)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-nativetask/src/test/java/org/apache/hadoop/mapred/nativetask/testutil/EnforceNativeOutputCollectorDelegator.java:40
+LOG.error("load nativetask lib failed, Native-Task Delegation is disabled", e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/DataNode.java:2113
+LOG.info("Shutdown complete.")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/src/main/java/org/apache/hadoop/yarn/server/resourcemanager/reservation/InMemoryPlan.java:392
+LOG.error(errMsg)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/snapshot/TestRandomOpsWithSnapshots.java:486
+LOG.info("createTestFile, file created: " + newFile)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java:165
+LOG.error("Automatic failover is not enabled for " + localTarget + "." +
+          " Please ensure that automatic failover is enabled in the " +
+          "configuration before running the ZK failover controller.")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/src/test/java/org/apache/hadoop/mapreduce/JobHistoryFileParser.java:46
+LOG.info("parsing job history file " + path)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/token/delegation/ZKDelegationTokenSecretManager.java:826
+LOG.debug("Attempted to update a non-existing znode " + nodeRemovePath)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/src/main/java/org/apache/hadoop/yarn/server/applicationhistoryservice/FileSystemApplicationHistoryStore.java:526
+LOG.info("Start information of container "
+          + containerStart.getContainerId() + " is written")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockPlacementPolicyWithUpgradeDomain.java:89
+LOG.warn("Upgrade domain isn't defined for " + datanodeInfo)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/service/launcher/testservices/LaunchableRunningService.java:72
+LOG.info("CLI contains " + ARG_FAILING)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/java/org/apache/hadoop/yarn/util/resource/ResourceUtils.java:137
+LOG.debug("Adding resource type - name = " + VCORES
+            + ", units = , type = " + ResourceTypes.COUNTABLE)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics2/impl/MetricsSourceAdapter.java:114
+LOG.debug(attribute +": "+ a)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/DataNode.java:2695
+LOG.error("Failed to initialize storage directory " + locationString
+            + ". Exception details: " + ioe)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/snapshot/TestRandomOpsWithSnapshots.java:360
+LOG.info("Directory removed: " + deleteDir)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/fsdataset/impl/FsDatasetImpl.java:2434
+LOG.warn("Updating size of block " + blockId + " from "
+            + memBlockInfo.getNumBytes() + " to "
+            + memBlockInfo.getBlockDataLength())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/src/test/java/org/apache/hadoop/mapreduce/v2/hs/webapp/TestHSWebApp.java:108
+LOG.info("HsTaskPage")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/containermanager/logaggregation/LogAggregationService.java:172
+LOG.info("Waiting for aggregation to complete for " + appId)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/SecurityUtil.java:426
+LOG.debug("Acquired token "+token)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/src/main/java/org/apache/hadoop/registry/server/dns/ReverseZoneUtils.java:153
+LOG.error("Base IP address is invalid")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-timelineservice/src/main/java/org/apache/hadoop/yarn/server/timelineservice/collector/TimelineCollectorManager.java:275
+LOG.error("exception during timeline writer flush!", th)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/src/test/java/org/apache/hadoop/mapreduce/TestLocalRunner.java:336
+LOG.error("Dumping stacks")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-examples/src/main/java/org/apache/hadoop/examples/terasort/TeraOutputFormat.java:95
+LOG.info("Operation hsync is not supported so far on path with " +
+                  "erasure code policy set")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/api/impl/YarnClientImpl.java:312
+LOG.info("Submitted application " + applicationId)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/ServiceScheduler.java:293
+LOG.info("Triggering initial evaluation of component {}",
+            component.getName())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics2/sink/ganglia/GangliaSink31.java:64
+LOG.debug("Emitting metric " + name + ", type " + type + ", value " + value
+          + ", slope " + gSlope.name()+ " from hostname " + getHostName())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/NodeFencer.java:106
+LOG.error("Fencing method " + method + " failed with an unexpected error.", t)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/TestReencryption.java:1306
+LOG.info("Waiting for queued zones for re-encryption to be {}", expected)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/main/java/org/apache/hadoop/fs/azure/NativeAzureFileSystem.java:593
+LOG.info("Unable to delete source folder during folder rename redo. "
+              + "If the source folder is already gone, this is not an error "
+              + "condition. Continuing with redo.", e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/federation/router/PeriodicService.java:183
+LOG.warn(serviceName + " service threw an exception", ex)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/io/SequenceFile.java:3553
+LOG.debug("writing intermediate results to " + outputFile)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/api/impl/YarnClientImpl.java:950
+LOG.info("Signalling container " + containerId + " with command " + command)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/src/main/java/org/apache/hadoop/mapred/MapTask.java:1582
+LOG.info("Spilling map output")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/src/test/java/org/apache/hadoop/yarn/applications/distributedshell/TestDSFailedAppMaster.java:45
+LOG.info("NumAllocatedContainers is " + numAllocatedContainers.get()
+            + " and NumRequestedContainers is " + numAllocatedContainers.get()
+            + ".Application Master failed. exiting")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/fs/FileSystem.java:3326
+LOGGER.debug("Looking in service filesystems for implementation class")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/conf/ReconfigurationServlet.java:65
+LOG.info("getting attribute: " + CONF_SERVLET_RECONFIGURABLE_PREFIX +
+             req.getServletPath())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestMaintenanceState.java:1064
+LOG.info(output)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ErasureCodingPolicyManager.java:275
+LOG.info("The policy name " + assignedNewName + " already exists")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetUtils.java:827
+LOG.warn("Unable to wrap exception of type " +
+          clazz + ": it has no (String) constructor", e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockReportLeaseManager.java:311
+LOG.warn("BR lease 0x{} is not valid for DN {}, because the DN " +
+               "is not in the pending set.",
+               Long.toHexString(id), dn.getDatanodeUuid())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/test/java/org/apache/hadoop/fs/s3a/scale/ITestS3ADirectoryPerformance.java:185
+LOG.info("Time per call: {}", toHuman(timer.nanosPerOperation(attempts)))
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/src/main/java/org/apache/hadoop/yarn/server/timeline/RollingLevelDBTimelineStore.java:1064
+LOG.error("Error putting entity " + entity.getEntityId() + " of type "
+          + entity.getEntityType(), e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/test/java/org/apache/hadoop/fs/azure/AzureBlobStorageTestAccount.java:530
+LOG.warn("Skipping live Azure test because of missing test account")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/TestReencryptionHandler.java:194
+LOG.info("Throttle completed, consumed {}", sw.now(TimeUnit.MILLISECONDS))
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestDecommission.java:1220
+LOG.warn("Check file: " + e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs-client/src/main/java/org/apache/hadoop/hdfs/client/impl/BlockReaderLocalLegacy.java:631
+LOG.debug("skip {}", n)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services-api/src/main/java/org/apache/hadoop/yarn/service/webapp/ApiServerWebApp.java:154
+logger.info("War = {}", Collections
+          .singletonList(apiServer.getWebAppContext().getWar()))
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/main/java/org/apache/hadoop/fs/s3a/S3AFileSystem.java:2401
+LOG.info("Interrupted: aborting upload")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/main/java/org/apache/hadoop/mapreduce/v2/app/job/impl/TaskAttemptImpl.java:985
+LOG.info("The job-jar file on the remote FS is "
+          + remoteJobJar.toUri().toASCIIString())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-auth/src/main/java/org/apache/hadoop/security/authentication/util/ZKSignerSecretProvider.java:368
+LOG.info("Connecting to ZooKeeper with SASL/Kerberos"
+              + "and using 'sasl' ACLs")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/io/compress/zlib/ZlibFactory.java:59
+LOG.info("Successfully loaded & initialized native-zlib library")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/TestSequenceFile.java:388
+LOG.info("Testing SequenceFile with metadata")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/src/main/java/org/apache/hadoop/mapred/LocalJobRunner.java:425
+LOG.debug("Map tasks to process: " + this.numMapTasks)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/security/alias/TestCredentialProviderFactory.java:56
+LOG.info("Running test " + test.getMethodName())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/fsdataset/impl/FsDatasetCache.java:471
+LOG.warn("Failed to cache " + key, e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/containermanager/logaggregation/SampleContainerLogAggregationPolicy.java:80
+LOG.warn("The format isn't valid. Sample rate falls back to the " +
+                "default value " + DEFAULT_SAMPLE_RATE)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/util/GenericOptionsParser.java:349
+LOG.debug("setting conf tokensFile: " + fileName)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-timelineservice-hbase/src/main/java/org/apache/hadoop/yarn/server/timelineservice/storage/reader/TimelineEntityReader.java:214
+LOG.info("Cannot find matching entity of type " +
+          getContext().getEntityType())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-sharedcachemanager/src/main/java/org/apache/hadoop/yarn/server/sharedcachemanager/metrics/ClientSCMMetrics.java:47
+LOG.debug("Initialized " + registry)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/test/java/org/apache/hadoop/mapreduce/v2/app/rm/TestRMContainerAllocator.java:271
+LOG.info("Running testMapNodeLocality")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/src/main/java/org/apache/hadoop/yarn/server/timeline/TimelineDataManager.java:110
+LOG.info("Error when verifying access for user " + ugi
+          + " on the events of the timeline entity "
+          + new EntityIdentifier(entity.getEntityId(),
+          entity.getEntityType()), e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestDistributedFileSystem.java:1484
+LOG.info("Test create an empty file")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/src/main/java/org/apache/hadoop/mapreduce/v2/hs/HistoryFileManager.java:815
+LOG.warn("Could not find timestamp portion from path: " + serialDirPath
+          + ". Continuing with next")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/compress/TestCodec.java:685
+LOG.info("seed: " + seed)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/main/java/org/apache/hadoop/mapreduce/v2/app/rm/RMCommunicator.java:237
+LOG.info("Waiting for application to be successfully unregistered.")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/main/java/org/apache/hadoop/mapred/LocalContainerLauncher.java:489
+LOG.warn("Exception running local (uberized) 'child' : "
+            + StringUtils.stringifyException(exception))
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-sls/src/main/java/org/apache/hadoop/yarn/sls/scheduler/SchedulerMetrics.java:446
+LOG.error("Cannot create directory {}", dir.getAbsoluteFile())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockPlacementPolicyRackFaultTolerant.java:148
+LOG.debug("Caught exception was:", e)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-auth/src/main/java/org/apache/hadoop/security/authentication/server/KerberosAuthenticationHandler.java:272
+LOG.trace("SPNEGO starting for url: {}", request.getRequestURL())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/src/test/java/org/apache/hadoop/yarn/server/applicationhistoryservice/TestFileSystemApplicationHistoryStore.java:99
+LOG.info("Starting testReadWriteHistoryData")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/src/test/java/org/apache/hadoop/mapreduce/TestValueIterReset.java:292
+LOG.info("TEST:1. Check:5 Expected: " + expectedValues.get(count)
+            + ", Got: " + i)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/src/main/java/org/apache/hadoop/yarn/webapp/WebApps.java:254
+LOG.debug("setting webapp host class to {}", cls)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/src/main/java/org/apache/hadoop/mapreduce/lib/output/PathOutputCommitterFactory.java:161
+LOG.debug("Using schema-specific factory for {}", outputPath)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/util/ThreadUtil.java:47
+LOG.warn("interrupted while sleeping", ie)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/src/main/java/org/apache/hadoop/yarn/server/federation/store/impl/ZookeeperFederationStateStore.java:344
+LOG.warn("The queried SubCluster: {} does not exist.", subClusterId)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-auth/src/main/java/org/apache/hadoop/security/authentication/util/KerberosName.java:401
+LOG.info("No auth_to_local rules applied to {}", this)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/snapshot/TestSnapshotDiffReport.java:194
+LOG.info(report.toString())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-examples/src/main/java/org/apache/hadoop/examples/terasort/TeraScheduler.java:158
+LOG.debug("  examine: " + cur.filename + " " + cur.locations.size())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-aws/src/main/java/org/apache/hadoop/fs/s3a/S3AFileSystem.java:591
+LOG.debug("Setting input strategy: {}", inputPolicy)
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/token/delegation/AbstractDelegationTokenSecretManager.java:490
+LOG.info("Token renewal for identifier: " + formatTokenId(id)
+        + "; total currentTokens " +  currentTokens.size())
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/conf/TestConfigurationFieldsBase.java:652
+LOG.info("\n")
+/Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs-client/src/main/java/org/apache/hadoop/hdfs/FileChecksumHelper.java:485
+LOG.debug("Got access token error in response to OP_BLOCK_CHECKSUM "
+                    + "for file {} for block {} from datanode {}. Will retry "
+                    + "the block once.",
+                getSrc(), block, datanodes[j])
+
