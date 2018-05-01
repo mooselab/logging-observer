@@ -33,7 +33,8 @@
         <!-- Add your actions here -->
         <group id="LoggingPlugin.MainMenu" text="Logging" description="Logging options">
             <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="LogPlugin.SearchLogging" class="searchlogging.SearchLoggingUsages" text="Search Logging" description="Search logging statements"/>
+            <action id="LogPlugin.SearchLogging" class="searchlogging.SearchLoggingUsages" text="Search All Logging Statements" description="Search all logging statements"/>
+            <action id="LogPlugin.SampleLogging" class="searchlogging.SampleLoggingUsages" text="Sample 100 Logging Statements" description="Sample 100 logging statements"/>
         </group>
     </actions>
 </idea-plugin>

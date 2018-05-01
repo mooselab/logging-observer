@@ -4,6 +4,7 @@ import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
@@ -25,9 +26,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class SearchLoggingUsages extends AnAction {
-
     // slf4j logger for development environment, configured in this plugin project's resources/logback.xml file
     private static final Logger logger = LoggerFactory.getLogger(SearchLoggingUsages.class);
 
@@ -41,52 +42,24 @@ public class SearchLoggingUsages extends AnAction {
         String projectName = project.getName();
         logger.info("Start to search logging statements in project " + projectName +".");
 
-        // get all java files in a project
+
+/*        // get all java files in a project
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(
                 FileTypeIndex.NAME,
                 JavaFileType.INSTANCE,
                 GlobalSearchScope.projectScope(project)
         );
         int nFiles = virtualFiles.size();
-        /*
+        *//*
         StringBuilder filenames = new StringBuilder();
         for (VirtualFile virtualFile : virtualFiles) {
             filenames.append(virtualFile.getPath() + "\n");
         }
-        */
-        logger.info("The project " + projectName + " has " + nFiles + " Java files.");
+        *//*
+        logger.info("The project " + projectName + " has " + nFiles + " Java files.");*/
 
-        // find all occurences of "Logger"
-        //List<PsiElement> elements = new ArrayList<>();
-        List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
-        PsiSearchHelper.SERVICE.getInstance(project).processElementsWithWord(
-                (psiElement, offsetInElement) -> {
-                    if (psiElement instanceof PsiTypeElement) {
-                        //elements.add(psiElement);
-                        PsiElement parent = psiElement.getParent();
-                        //elements.add(parent);
-                        if (parent instanceof PsiField) {
-                            PsiField field = (PsiField)parent;
-                            Query<PsiReference> references = ReferencesSearch.search(field);
-                            for (PsiReference ref : references) {
-                                PsiElement usage = ref.getElement();
-                                //elements.add(usage);
-                                //elements.add(usage.getParent());
-                                //elements.add(usage.getParent().getParent());
-
-                                PsiElement grandparent = usage.getParent().getParent();
-                                if (grandparent instanceof PsiMethodCallExpression) {
-                                    loggingStatements.add((PsiMethodCallExpression)grandparent);
-                                }
-                            }
-
-                        }
-
-                    }
-                    return true;
-                }, GlobalSearchScope.projectScope(project), "Logger",
-                UsageSearchContext.IN_CODE, true
-        );
+        // find all logging statements in the project
+        List<PsiMethodCallExpression> loggingStatements = LoggingSearchUtils.findLoggingStatementsInProject(project);
 
         /*
         StringBuilder loggers = new StringBuilder();
@@ -98,26 +71,26 @@ public class SearchLoggingUsages extends AnAction {
 
         StringBuilder loggingStatementsStr = new StringBuilder();
         for (PsiMethodCallExpression log : loggingStatements) {
+            PsiFile psiFile = log.getContainingFile();
+            int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
+            loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
             loggingStatementsStr.append(log.getText()).append(("\n"));
-        }
 
+            /*
+            loggingStatementsStr.append(log.getMethodExpression().getText()).append("\n");
+            loggingStatementsStr.append(log.getMethodExpression().toString()).append("\n");
+            String methodStr = log.getMethodExpression().getText();
+            if (methodStr.matches(".*\\.(trace|debug|info|warn|error|fatal)")) {
+                loggingStatementsStr.append(methodStr.substring(methodStr.lastIndexOf('.')+1)).append("\n");
+            }
+            */
+        }
         //logger.debug("\"Logger\" occurrences: \n{}", loggers);
         logger.debug("Logging statements: \n" + loggingStatementsStr);
 
-        /**
-         * Show logging statements in the find tool window
-         * Refer to: https://intellij-support.jetbrains.com/hc/en-us/community/posts/
-         * 206756375-Showing-custom-usage-results-ReferenceSearch-in-Find-toolwindow
-         */
-        final List<Usage> usages = new ArrayList<>();
-        for (PsiElement log : loggingStatements) {
-            final UsageInfo usageInfo = new UsageInfo(log);
-            Usage usage = new UsageInfo2UsageAdapter(usageInfo);
-            usages.add(usage);
-        }
+        // list the logging statements in the find tool window view
+        LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, loggingStatements);
 
-        UsageViewManager.getInstance(project).showUsages(
-                UsageTarget.EMPTY_ARRAY, usages.toArray(new Usage[usages.size()]), new UsageViewPresentation());
     }
 
     @Override
