@@ -9,6 +9,20 @@ LOG.warn("notifyOfResponse for policy failed for home sub-cluster "
 LOG.debug("CreateNode result: " + rc + " for path: " + path
           + " connectionState: " + zkConnectionState +
           "  for " + this)
+>> logging the input parameter of a method
+  public synchronized void processResult(int rc, String path, Object ctx,
+      String name) {
+    if (isStaleClient(ctx)) return;
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("CreateNode result: " + rc + " for path: " + path
+          + " connectionState: " + zkConnectionState +
+          "  for " + this);
+    }
+
+logging-code link:
+Similarity between log text + log variable and method name + method parameters
+
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/src/main/java/org/apache/hadoop/yarn/server/resourcemanager/reservation/InMemoryPlan.java:477
 LOG.debug("Running archival at time: {}", tick)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/DNS.java:268
@@ -95,10 +109,21 @@ LOG.info("Shutdown complete.")
 LOG.error(errMsg)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/snapshot/TestRandomOpsWithSnapshots.java:486
 LOG.info("createTestFile, file created: " + newFile)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/ZKFailoverController.java:165
 LOG.error("Automatic failover is not enabled for " + localTarget + "." +
           " Please ensure that automatic failover is enabled in the " +
           "configuration before running the ZK failover controller.")
+>> logging the return value of a method call
+    if (!localTarget.isAutoFailoverEnabled()) {
+      LOG.error("Automatic failover is not enabled for " + localTarget + "." +
+          " Please ensure that automatic failover is enabled in the " +
+          "configuration before running the ZK failover controller.");
+      return ERR_CODE_AUTO_FAILOVER_NOT_ENABLED;
+    }
+Logging-code linking:
+Similarity between log text + variable versus object + method name + positive/negative results.
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/src/test/java/org/apache/hadoop/mapreduce/JobHistoryFileParser.java:46
 LOG.info("parsing job history file " + path)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/token/delegation/ZKDelegationTokenSecretManager.java:826
@@ -147,8 +172,28 @@ LOG.info("Triggering initial evaluation of component {}",
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics2/sink/ganglia/GangliaSink31.java:64
 LOG.debug("Emitting metric " + name + ", type " + type + ", value " + value
           + ", slope " + gSlope.name()+ " from hostname " + getHostName())
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/NodeFencer.java:106
 LOG.error("Fencing method " + method + " failed with an unexpected error.", t)
+>> logging an exception triggered by a method call with corresponding throws clauses
+
+      try {
+        if (method.method.tryFence(fromSvc, method.arg)) {
+          LOG.info("====== Fencing successful by method " + method + " ======");
+          return true;
+        }
+      } catch (BadFencingConfigurationException e) {
+        LOG.error("Fencing method " + method + " misconfigured", e);
+        continue;
+      } catch (Throwable t) {
+        LOG.error("Fencing method " + method + " failed with an unexpected error.", t);
+        continue;
+      }
+
+Logging-code linking:
+1. Match logged exception with the methods that throw the exception
+2. similarity between log text and method call expression
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/TestReencryption.java:1306
 LOG.info("Waiting for queued zones for re-encryption to be {}", expected)
 
