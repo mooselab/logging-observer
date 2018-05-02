@@ -17,6 +17,7 @@ import com.intellij.usages.*;
 import com.intellij.util.Query;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
+
 // logger for development environment, configured in this plugin project's resources/logback.xml file
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

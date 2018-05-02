@@ -25,9 +25,41 @@ Similarity between log text + log variable and method name + method parameters
 
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/src/main/java/org/apache/hadoop/yarn/server/resourcemanager/reservation/InMemoryPlan.java:477
 LOG.debug("Running archival at time: {}", tick)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/DNS.java:268
 LOG.warn("Unable to determine hostname for interface " +
           strInterface)
+>> logging the result of a process
+    public static String[] getHosts(String strInterface,
+                                  @Nullable String nameserver,
+                                  boolean tryfallbackResolution)
+      throws UnknownHostException {
+    final List<String> hosts = new Vector<String>();
+    final List<InetAddress> addresses =
+        getIPsAsInetAddressList(strInterface, true);
+    for (InetAddress address : addresses) {
+      try {
+        hosts.add(reverseDns(address, nameserver));
+      } catch (NamingException ignored) {
+      }
+    }
+    if (hosts.isEmpty() && tryfallbackResolution) {
+      for (InetAddress address : addresses) {
+        final String canonicalHostName = address.getCanonicalHostName();
+        // Don't use the result if it looks like an IP address.
+        if (!InetAddresses.isInetAddress(canonicalHostName)) {
+          hosts.add(canonicalHostName);
+        }
+      }
+    }
+
+    if (hosts.isEmpty()) {
+      LOG.warn("Unable to determine hostname for interface " +
+          strInterface);
+      hosts.add(cachedHostname);
+    }
+logging-code linking:
+log text + log variable versus method name + method parameters
 
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-tools/hadoop-azure/src/main/java/org/apache/hadoop/fs/azure/AzureNativeFileSystemStore.java:2087
 LOG.debug("{} is a folder blob.", key)
@@ -56,8 +88,20 @@ log.info("    Version           : {}", serverInfo.getProperty(name + ".version",
 LOG.info(buf.toString())
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/security/token/DtFileOperations.java:200
 LOG.info("Add token with service " + alias)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/compress/TestCodec.java:191
 LOG.info("Created a Codec object of type: " + codecClass)
+>> logging a method call
+    try {
+      codec = (CompressionCodec)
+        ReflectionUtils.newInstance(conf.getClassByName(codecClass), conf);
+    } catch (ClassNotFoundException cnfe) {
+      throw new IOException("Illegal codec!");
+    }
+    LOG.info("Created a Codec object of type: " + codecClass);
+logging-code linking:
+Similarity of log text + log variables versus method return variable + method parameters
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/src/main/java/org/apache/hadoop/yarn/server/nodemanager/DefaultContainerExecutor.java:165
 LOG.info("Copying from " + nmPrivateContainerTokensPath
         + " to " + tokenDst)
@@ -138,8 +182,20 @@ LOG.info("CLI contains " + ARG_FAILING)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/src/main/java/org/apache/hadoop/yarn/util/resource/ResourceUtils.java:137
 LOG.debug("Adding resource type - name = " + VCORES
             + ", units = , type = " + ResourceTypes.COUNTABLE)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics2/impl/MetricsSourceAdapter.java:114
 LOG.debug(attribute +": "+ a)
+>> logging a method return value
+      Attribute a = attrCache.get(attribute);
+      if (a == null) {
+        throw new AttributeNotFoundException(attribute +" not found");
+      }
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(attribute +": "+ a);
+      }
+logging-code linking:
+log variable versus method parameters + return variable
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/DataNode.java:2695
 LOG.error("Failed to initialize storage directory " + locationString
             + ". Exception details: " + ioe)
@@ -169,9 +225,21 @@ LOG.info("Submitted application " + applicationId)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/ServiceScheduler.java:293
 LOG.info("Triggering initial evaluation of component {}",
             component.getName())
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/metrics2/sink/ganglia/GangliaSink31.java:64
 LOG.debug("Emitting metric " + name + ", type " + type + ", value " + value
           + ", slope " + gSlope.name()+ " from hostname " + getHostName())
+>> logging the entry of a method
+  protected void emitMetric(String groupName, String name, String type,
+      String value, GangliaConf gConf, GangliaSlope gSlope)
+    throws IOException {
+    .......
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Emitting metric " + name + ", type " + type + ", value " + value
+          + ", slope " + gSlope.name()+ " from hostname " + getHostName());
+    }
+logging-code linking:
+log text + variable versus method name + parameters
 
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/ha/NodeFencer.java:106
 LOG.error("Fencing method " + method + " failed with an unexpected error.", t)
@@ -217,8 +285,22 @@ Logging-code linking:
 
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/federation/router/PeriodicService.java:183
 LOG.warn(serviceName + " service threw an exception", ex)
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/io/SequenceFile.java:3553
 LOG.debug("writing intermediate results to " + outputFile)
+>> logging a method call
+            if(LOG.isDebugEnabled()) {
+              LOG.debug("writing intermediate results to " + outputFile);
+            }
+            Writer writer = cloneFileAttributes(
+                                                fs.makeQualified(segmentsToMerge.get(0).segmentPathName),
+                                                fs.makeQualified(outputFile), null);
+            writer.sync = null; //disable sync for temp files
+            writeFile(this, writer);
+            writer.close();
+logging-code linking:
+Similarity between log text + log variable and method name
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/api/impl/YarnClientImpl.java:950
 LOG.info("Signalling container " + containerId + " with command " + command)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/src/main/java/org/apache/hadoop/mapred/MapTask.java:1582
@@ -247,9 +329,24 @@ Similarity between log text + log variable and method name + method parameters.
 LOG.info(output)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ErasureCodingPolicyManager.java:275
 LOG.info("The policy name " + assignedNewName + " already exists")
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetUtils.java:827
 LOG.warn("Unable to wrap exception of type " +
           clazz + ": it has no (String) constructor", e)
+>> logging an exception thrown by a method declaring the exception
+    try {
+      Constructor<? extends Throwable> ctor = clazz.getConstructor(String.class);
+      Throwable t = ctor.newInstance(msg);
+      return (T)(t.initCause(exception));
+    } catch (Throwable e) {
+      LOG.warn("Unable to wrap exception of type " +
+          clazz + ": it has no (String) constructor", e);
+      return exception;
+    }
+logging-code linking:
+1. logged exception type versus exceptions thrown by methods
+2. texual similarity
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockReportLeaseManager.java:311
 LOG.warn("BR lease 0x{} is not valid for DN {}, because the DN " +
                "is not in the pending set.",
@@ -326,8 +423,15 @@ Similarity between log text and method call parameters (special for getProperty 
 
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/io/compress/zlib/ZlibFactory.java:59
 LOG.info("Successfully loaded & initialized native-zlib library")
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/TestSequenceFile.java:388
 LOG.info("Testing SequenceFile with metadata")
+>> logging the entry of a method
+public void testSequenceFileMetadata() throws Exception {
+    LOG.info("Testing SequenceFile with metadata");
+logging-code linking:
+Similarity between log text and method name.
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/src/main/java/org/apache/hadoop/mapred/LocalJobRunner.java:425
 LOG.debug("Map tasks to process: " + this.numMapTasks)
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/security/alias/TestCredentialProviderFactory.java:56
@@ -356,8 +460,16 @@ LOG.info("Test create an empty file")
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/src/main/java/org/apache/hadoop/mapreduce/v2/hs/HistoryFileManager.java:815
 LOG.warn("Could not find timestamp portion from path: " + serialDirPath
           + ". Continuing with next")
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/io/compress/TestCodec.java:685
 LOG.info("seed: " + seed)
+>> logging a method return value
+    long seed = r.nextLong();
+    r.setSeed(seed);
+    LOG.info("seed: " + seed);
+logging-code linking:
+Similarity between log text + variable and method return variable
+
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/main/java/org/apache/hadoop/mapreduce/v2/app/rm/RMCommunicator.java:237
 LOG.info("Waiting for application to be successfully unregistered.")
 /Users/hengli/Projects/open-source-projects/hadoop/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/src/main/java/org/apache/hadoop/mapred/LocalContainerLauncher.java:489

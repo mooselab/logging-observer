@@ -9,3 +9,20 @@ the openFile -> IOException scenarios. Hopefully, they should be logged similarl
 
 We can add other metrics, such as the number of containing loops, the number of method calls in the try block,
 and whether the exception is handled.
+
+Metrics:
+
+Method call that throws exception // what happened? what causes an error? (need to consider exception class hierarchies)
+Number of method call that throws the caught exception // how clear is the exception caught related to the method throwing the exception
+Exception type // how serious the problem is (need to consider exception class hierarchies)
+Is caught exception a super class of the thrown exception?
+Is contained in loop (two metrics) // how the logging would be replicated
+  > is logging statement inside a loop in catch block?
+  > is catch block inside a loop?
+Exception handling method
+Number of method calls before/after the logging statement // how much effort is used to handle the exception
+Lines of code before/after the logging statement // how much effort is used to handle the exception
+Number of method calls before/after the method call throwing the exception // how close the catch block is related to the method call
+Number of blocks containing the logging statement but within the catch block (excluding logging guards) // how close this logging statement is related to the exception
+If the exception is re-thrown // re-thrown means the method pass the exception to its caller to handle
+Does the catch block have returns? // return might indicate an problem hard to handle

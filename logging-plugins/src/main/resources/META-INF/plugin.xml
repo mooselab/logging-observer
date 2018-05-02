@@ -35,6 +35,7 @@
             <add-to-group group-id="MainMenu" anchor="last"/>
             <action id="LogPlugin.SearchLogging" class="searchlogging.SearchLoggingUsages" text="Search All Logging Statements" description="Search all logging statements"/>
             <action id="LogPlugin.SampleLogging" class="searchlogging.SampleLoggingUsages" text="Sample 100 Logging Statements" description="Sample 100 logging statements"/>
+            <action id="LogPlugin.SearchExceptionLogging" class="searchlogging.SearchExceptionLogging" text="Search Exception Logging" description="Search all exception logging statements"/>
         </group>
     </actions>
 </idea-plugin>
