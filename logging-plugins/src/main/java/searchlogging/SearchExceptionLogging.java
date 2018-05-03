@@ -4,11 +4,11 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiCatchSection;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+
+import loggingmetrics.ExceptionLoggingMetrics;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ public class SearchExceptionLogging extends AnAction {
 
     // intellij logger for integrated plugin environment, configured in intellij's bin/log.xml file
     //private static final Logger logger = Logger.getInstance(SearchLoggingUsages.class);
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
@@ -61,7 +62,24 @@ public class SearchExceptionLogging extends AnAction {
         for (PsiMethodCallExpression log : exceptionLogs) {
             PsiFile psiFile = log.getContainingFile();
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
+
+            ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
+            List<PsiType> psiTypes = metrics.getExceptionTypes();
             loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
+            /*
+            if (psiTypes.size() > 0) {
+                loggingStatementsStr.append("Exception type: ").append(psiType.getCanonicalText()).append("\n");
+            } else {
+                loggingStatementsStr.append("Exception type: ").append("null").append("\n");
+            }
+            */
+            String typesStr = psiTypes.stream().map(t -> t.getCanonicalText()).reduce("", (a, b) -> a + " " + b);
+            loggingStatementsStr.append("Exception type: ").append(typesStr).append("\n");
+
+            List<PsiMethod> methods = metrics.getExceptionMethods();
+            String methodsStr = methods.stream().map(m -> m.getName()).reduce("", (a,b) -> a + " " +b );
+            loggingStatementsStr.append("Exception methods: ").append(methodsStr).append("\n");
+
             loggingStatementsStr.append(log.getText()).append(("\n"));
         }
         logger.info("Logging statements: \n" + loggingStatementsStr);

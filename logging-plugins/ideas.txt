@@ -25,4 +25,10 @@ Lines of code before/after the logging statement // how much effort is used to h
 Number of method calls before/after the method call throwing the exception // how close the catch block is related to the method call
 Number of blocks containing the logging statement but within the catch block (excluding logging guards) // how close this logging statement is related to the exception
 If the exception is re-thrown // re-thrown means the method pass the exception to its caller to handle
+Number of throw statements in the catch block
 Does the catch block have returns? // return might indicate an problem hard to handle
+Does the try block have returns? // return might indicate an important task failed to finish (e.g., fail to return)
+
+Challenges:
+RuntimeException might not be declares in method throws clauses.
+
