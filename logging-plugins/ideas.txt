@@ -18,6 +18,7 @@ Number of method call that throws the caught exception // how clear is the excep
 Is method from java-lang / third-party library / project?
 Exception type // how serious the problem is (need to consider exception class hierarchies)
 Is exception type from java-lang / third-party library / project?
+Is check exception / runtime exception / error?
 Is caught exception a super class of the thrown exception?
 Is contained in loop (two metrics) // how the logging would be replicated
   > is logging statement inside a loop in catch block?
@@ -42,6 +43,10 @@ Basic exception type:
 Checked exception (subclasses of Exception which is a subclass of throwable)
 RuntimeException (subclasses of RuntimeException which is a subclass of Exception)
 Error (subclasses of Error which is a subclass of throwable)
+
+Checked exceptions are subject to the Catch or Specify Requirement.
+All exceptions are checked exceptions, except for those indicated by Error, RuntimeException, and their subclasses.
+RuntimeException and Error are not subject to the Catch or Specify Requirement.
 
 Use log/level/tracktrace ratio to represent a type of exception or method call, instead of using the exception types or method calls.
 
