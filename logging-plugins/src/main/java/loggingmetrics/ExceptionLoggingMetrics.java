@@ -1,6 +1,5 @@
 package loggingmetrics;
 
-import com.intellij.lang.jvm.types.JvmReferenceType;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 
@@ -8,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,19 +14,65 @@ import java.util.stream.Collectors;
 public class ExceptionLoggingMetrics {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionLoggingMetrics.class);
 
-    private PsiMethodCallExpression logstmt;
+    private PsiMethodCallExpression logStmt;
+    List<PsiType> exceptionTypes;
+    List<PsiMethod> exceptionMethods;
+
+
 
     public ExceptionLoggingMetrics(PsiMethodCallExpression _logstmt) {
-        logstmt = _logstmt;
+        logStmt = _logstmt;
+        exceptionTypes = deriveExceptionTypes();
+        exceptionMethods = deriveExceptionMethods();
+    }
+
+    public List<PsiType> getExceptionTypes() {return exceptionTypes;}
+    public List<PsiMethod> getExceptionMethods() {return exceptionMethods;}
+
+    public String getPresentableExceptionTypes() {
+        if (exceptionTypes.size() == 0) {
+            return "UnknownException";
+        } else if (exceptionTypes.size() == 1) {
+            return exceptionTypes.get(0).getPresentableText();
+        } else {
+            return "MultiExceptions";
+/*            return exceptionTypes.
+                    stream().
+                    map(t -> t.getCanonicalText()).
+                    reduce("", (a, b) -> a + " " + b);*/
+        }
+    }
+
+    public String getPresentableExceptionMethods() {
+        if (exceptionMethods.size() == 0) {
+            return "UnKnownMethod";
+        } else if (exceptionMethods.size() == 1) {
+            PsiMethod method = exceptionMethods.get(0);
+            PsiClass containingClass = method.getContainingClass();
+            return containingClass.getName() + "." + method.getName();
+        } else {
+            return "MultiMethods";
+/*            return exceptionMethods.
+                    stream().
+                    map(m -> m.getName()).
+                    reduce("", (a,b) -> a + " " +b );*/
+        }
+    }
+
+    public boolean isProjectException() {
+        for (PsiType ex : exceptionTypes) {
+            // TODO: check the source of the exception: project, library, or Java
+        }
+        return true;
     }
 
     /**
      * Get the exception types of the catch block that contain the logging statement (i.e., logged exception types)
      * @return
      */
-    public List<PsiType> getExceptionTypes() {
+    private List<PsiType> deriveExceptionTypes() {
         // catch clause
-        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logstmt, PsiCatchSection.class);
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
         if (catchSection == null) {
             return null;
         }
@@ -61,15 +105,11 @@ public class ExceptionLoggingMetrics {
      * Get the methods in the try block that "throws" the logged exception types (or their sub types)
      * @return
      */
-    //public List<PsiMethod> getExceptionMethods(PsiType exType) {
-    public List<PsiMethod> getExceptionMethods() {
+    private List<PsiMethod> deriveExceptionMethods() {
         List<PsiMethod> exMethods = new ArrayList<>();
 
-        // logged exception types
-        List<PsiType> exTypes = this.getExceptionTypes();
-
         // try statement
-        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(logstmt, PsiTryStatement.class);
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(logStmt, PsiTryStatement.class);
         if (tryStatement == null) {
             return null;
         }
@@ -91,13 +131,18 @@ public class ExceptionLoggingMetrics {
             methods.add(method);
         }
 
+        // if there is only one method in the try block, then it is the exception throwing method
+        if (methods.size() == 1) {
+            return methods;
+        }
+
         // select methods that declare exceptions same as the given exception type
         for (PsiMethod method : methods) {
             PsiType[] throwsTypes = method.getThrowsList().getReferencedTypes();
 
             boolean match = false;
             for (PsiType throwsType: throwsTypes) {
-                for (PsiType caughtType : exTypes) {
+                for (PsiType caughtType : exceptionTypes) {
                     if (isSubTypeOrSameType(throwsType, caughtType)) {
                         exMethods.add(method);
                         match = true;

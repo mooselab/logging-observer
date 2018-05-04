@@ -10,11 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import loggingmetrics.ExceptionLoggingMetrics;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 // logger for development environment, configured in this plugin project's resources/logback.xml file
 import org.slf4j.Logger;
@@ -62,22 +59,12 @@ public class SearchExceptionLogging extends AnAction {
         for (PsiMethodCallExpression log : exceptionLogs) {
             PsiFile psiFile = log.getContainingFile();
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
+            loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
 
             ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
-            List<PsiType> psiTypes = metrics.getExceptionTypes();
-            loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
-            /*
-            if (psiTypes.size() > 0) {
-                loggingStatementsStr.append("Exception type: ").append(psiType.getCanonicalText()).append("\n");
-            } else {
-                loggingStatementsStr.append("Exception type: ").append("null").append("\n");
-            }
-            */
-            String typesStr = psiTypes.stream().map(t -> t.getCanonicalText()).reduce("", (a, b) -> a + " " + b);
+            String typesStr = metrics.getPresentableExceptionTypes();
             loggingStatementsStr.append("Exception type: ").append(typesStr).append("\n");
-
-            List<PsiMethod> methods = metrics.getExceptionMethods();
-            String methodsStr = methods.stream().map(m -> m.getName()).reduce("", (a,b) -> a + " " +b );
+            String methodsStr = metrics.getPresentableExceptionMethods();
             loggingStatementsStr.append("Exception methods: ").append(methodsStr).append("\n");
 
             loggingStatementsStr.append(log.getText()).append(("\n"));
