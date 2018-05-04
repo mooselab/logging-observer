@@ -17,6 +17,8 @@ Method call that throws exception // what happened? what causes an error? (need 
 Number of method call that throws the caught exception // how clear is the exception caught related to the method throwing the exception
 Is method from java-lang / third-party library / project?
 Exception type // how serious the problem is (need to consider exception class hierarchies)
+                                             // maybe need to use qualified exceptions,
+                                             // there are some conflicts, e.g., BinaryProtocol.ProtocolException versus the Java language one.
 Is exception type from java-lang / third-party library / project?
 Is check exception / runtime exception / error?
 Is caught exception a super class of the thrown exception?

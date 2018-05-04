@@ -1,8 +1,12 @@
 package loggingmetrics;
 
+import com.intellij.openapi.roots.*;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.openapi.project.Project;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +21,7 @@ public class ExceptionLoggingMetrics {
     private PsiMethodCallExpression logStmt;
     List<PsiType> exceptionTypes;
     List<PsiMethod> exceptionMethods;
+    Project project;
 
 
 
@@ -24,6 +29,19 @@ public class ExceptionLoggingMetrics {
         logStmt = _logstmt;
         exceptionTypes = deriveExceptionTypes();
         exceptionMethods = deriveExceptionMethods();
+        project = logStmt.getProject();
+
+        // debugging
+        /*
+        for (PsiType t : exceptionTypes) {
+            //logger.debug("Type name: " + t.getCanonicalText() + ", type class: " + getExceptionClass(t).getQualifiedName());
+            getExceptionSource(t);
+        } */
+
+        for (PsiMethod m : exceptionMethods) {
+            getMethodSource(m);
+        }
+
     }
 
     public List<PsiType> getExceptionTypes() {return exceptionTypes;}
@@ -59,11 +77,56 @@ public class ExceptionLoggingMetrics {
         }
     }
 
-    public boolean isProjectException() {
-        for (PsiType ex : exceptionTypes) {
-            // TODO: check the source of the exception: project, library, or Java
+    private ReferenceSource getExceptionSource(PsiType ex) {
+        PsiClass exClass = ((PsiClassType)ex).resolve();
+        VirtualFile vf = exClass.getContainingFile().getVirtualFile();
+        //logger.debug("Virtual file: " + vf.getCanonicalPath());
+        ReferenceSource source = getReferenceSourceOfVirtualFile(vf);
+
+        //logger.debug("Exception: " + ex.getCanonicalText() +
+        //        ", source: " + source);
+
+        return source;
+    }
+
+    private ReferenceSource getMethodSource(PsiMethod method) {
+        VirtualFile vf = method.getContainingFile().getVirtualFile();
+        ReferenceSource source = getReferenceSourceOfVirtualFile(vf);
+
+        logger.debug("Method: " + method.getContainingClass().getQualifiedName() + "." + method.getName() +
+                ", source: " + source);
+        return source;
+    }
+
+    @NotNull
+    private ReferenceSource getReferenceSourceOfVirtualFile(VirtualFile vf) {
+        ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        boolean isInLibraryOrJdk = projectFileIndex.isInLibrary(vf);
+        boolean isInLibrary = false, isInJdk = false;
+        //irtualFile ContentRoot = projectFileIndex.getContentRootForFile(vf);
+        if (isInLibraryOrJdk) {
+            List<OrderEntry> orderEntries = projectFileIndex.getOrderEntriesForFile(vf);
+            for (OrderEntry entry : orderEntries) {
+                if (entry instanceof LibraryOrderEntry) {
+                    isInLibrary = true;
+                }
+                if (entry instanceof JdkOrderEntry) {
+                    isInJdk = true;
+                }
+            }
         }
-        return true;
+
+        if (isInJdk) {
+            return ReferenceSource.FROMJDK;
+        } else if (isInLibrary) {
+            return ReferenceSource.FROMLIBRARY;
+        } else {
+            return ReferenceSource.FROMPROJECT;
+        }
+    }
+
+    private PsiClass getExceptionClass(PsiType ex) {
+        return ((PsiClassType)ex).resolve();
     }
 
     /**
@@ -120,6 +183,9 @@ public class ExceptionLoggingMetrics {
         // method calls in the try block
         Collection<PsiMethodCallExpression> methodCalls = PsiTreeUtil.findChildrenOfType(tryBlock, PsiMethodCallExpression.class);
 
+        // new expressions (e.g., new LdapName(dn)) can also throw exceptions
+        Collection<PsiNewExpression> newExpressions = PsiTreeUtil.findChildrenOfType(tryBlock, PsiNewExpression.class);
+
         // resolve method calls to method declarations
         List<PsiMethod> methods = new ArrayList<>();
         for (PsiMethodCallExpression methodCall : methodCalls) {
@@ -129,6 +195,16 @@ public class ExceptionLoggingMetrics {
             //logger.debug("Throws: " + Arrays.stream(throwsTypes).map(t -> t.getCanonicalText()).
             //        reduce("", (a, b) -> a + " " + b ));
             methods.add(method);
+        }
+        // resolve new expressions to method declarations (i.e., constructor declarations)
+        for (PsiNewExpression newExpr : newExpressions) {
+            PsiMethod method = newExpr.resolveMethod();
+            //logger.debug("newExpression: " + newExpr.getText());
+            //logger.debug("resolvedMethod: " + newExpr.resolveMethod().getName());
+            //logger.debug("resolvedConsstructor: " + newExpr.resolveConstructor().getName());
+            if (method != null) { // the resolved result can be null when a new expression is a anonymous class
+                methods.add(method);
+            }
         }
 
         // if there is only one method in the try block, then it is the exception throwing method
