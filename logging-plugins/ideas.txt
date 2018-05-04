@@ -48,7 +48,15 @@ Checked exceptions are subject to the Catch or Specify Requirement.
 All exceptions are checked exceptions, except for those indicated by Error, RuntimeException, and their subclasses.
 RuntimeException and Error are not subject to the Catch or Specify Requirement.
 
+For RuntimeException and Error exception, we could not determine the throwing methods using exception matching.
+In this case, if there is only one method in the try block, use that method; otherwise, use "Unknown".
+
+If there are multiple exceptions or matched method calls, we use Multi_* labels.
+(e.g., Multi_Library, Multi_Lang, Multi_Project, Multi_Library_Project, ...)
+
 Use log/level/tracktrace ratio to represent a type of exception or method call, instead of using the exception types or method calls.
+
+
 
 
 
