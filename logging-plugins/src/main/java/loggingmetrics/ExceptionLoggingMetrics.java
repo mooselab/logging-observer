@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +24,6 @@ public class ExceptionLoggingMetrics {
     List<PsiMethod> exceptionMethods;
     Project project;
 
-
-
     public ExceptionLoggingMetrics(PsiMethodCallExpression _logstmt) {
         logStmt = _logstmt;
         exceptionTypes = deriveExceptionTypes();
@@ -32,7 +31,7 @@ public class ExceptionLoggingMetrics {
         project = logStmt.getProject();
 
         // debugging
-        
+        /*
         for (PsiType t : exceptionTypes) {
             //logger.debug("Type name: " + t.getCanonicalText() + ", type class: " + getExceptionClass(t).getQualifiedName());
             //getExceptionSource(t);
@@ -43,14 +42,15 @@ public class ExceptionLoggingMetrics {
         logger.debug("Presentable exception types: " + getPresentableExceptionTypes());
         logger.debug("Presentable exception category: " + getPresentableExceptionCategory());
         logger.debug("Presentable exception source: " + getPresentableExceptionSource());
-
+        */
         /*
         for (PsiMethod m : exceptionMethods) {
             getMethodSource(m);
         } */
+        /*
         logger.debug("Exception methods: " + getPresentableExceptionMethods());
         logger.debug("Method source: " + getPresentableMethodSource());
-
+        */
     }
 
     public List<PsiType> getExceptionTypes() {return exceptionTypes;}
@@ -84,6 +84,32 @@ public class ExceptionLoggingMetrics {
                     map(m -> m.getName()).
                     reduce("", (a,b) -> a + " " +b );*/
         }
+    }
+
+    public static String getLoggingMetricsHeader() {
+        List<String> metricsHeader = new ArrayList<>();
+        metricsHeader.add("exceptionType"); // exceptions caught by the containing catch block
+        metricsHeader.add("exceptionCategory"); // Normal exception, RuntimeException, or Error
+        metricsHeader.add("exceptionSource"); // project, library, or JDK
+        metricsHeader.add("exceptionNum"); // number of exceptions caught by the containing catch block
+        metricsHeader.add("methodCall"); // method call that throws the caught exceptions
+        metricsHeader.add("methodSource"); // project, library, or JDK
+        metricsHeader.add("methodNum"); // number of methods that throw the caught exceptions
+
+        return String.join(",", metricsHeader);
+    }
+
+    public String getLoggingMetrics() {
+        List<String> metrics = new ArrayList<>();
+        metrics.add(getPresentableExceptionTypes());
+        metrics.add(getPresentableExceptionCategory());
+        metrics.add(getPresentableExceptionSource());
+        metrics.add(String.valueOf(getExceptionTypes().size()));
+        metrics.add(getPresentableExceptionMethods());
+        metrics.add(getPresentableMethodSource());
+        metrics.add(String.valueOf(getExceptionMethods().size()));
+
+        return String.join(",",metrics);
     }
 
     public String getPresentableExceptionSource() {

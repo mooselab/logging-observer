@@ -55,6 +55,8 @@ public class SearchExceptionLogging extends AnAction {
             }
         }
 
+        logger.debug("Metrics header: " + ExceptionLoggingMetrics.getLoggingMetricsHeader());
+
         StringBuilder loggingStatementsStr = new StringBuilder();
         for (PsiMethodCallExpression log : exceptionLogs) {
             PsiFile psiFile = log.getContainingFile();
@@ -70,8 +72,10 @@ public class SearchExceptionLogging extends AnAction {
             loggingStatementsStr.append("Exception methods: ").append(methodsStr).append("\n");
 
             loggingStatementsStr.append(log.getText()).append(("\n"));
+
+            loggingStatementsStr.append(metrics.getLoggingMetrics()).append("\n");
         }
-        //logger.info("Logging statements: \n" + loggingStatementsStr);
+        logger.info("Logging statements: \n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, exceptionLogs);
