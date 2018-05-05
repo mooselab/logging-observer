@@ -61,6 +61,8 @@ public class SearchExceptionLogging extends AnAction {
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
             loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
 
+            //logger.debug(psiFile.getVirtualFile().getPath() + ":" + lineNumber);
+
             ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
             String typesStr = metrics.getPresentableExceptionTypes();
             loggingStatementsStr.append("Exception type: ").append(typesStr).append("\n");
@@ -69,7 +71,7 @@ public class SearchExceptionLogging extends AnAction {
 
             loggingStatementsStr.append(log.getText()).append(("\n"));
         }
-        logger.info("Logging statements: \n" + loggingStatementsStr);
+        //logger.info("Logging statements: \n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, exceptionLogs);

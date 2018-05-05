@@ -32,16 +32,24 @@ public class ExceptionLoggingMetrics {
         project = logStmt.getProject();
 
         // debugging
-
+        
         for (PsiType t : exceptionTypes) {
             //logger.debug("Type name: " + t.getCanonicalText() + ", type class: " + getExceptionClass(t).getQualifiedName());
             //getExceptionSource(t);
-            logger.debug("Exception: " + t.getCanonicalText() + ", Exception category: " + getExceptionCategory(t));
+            logger.debug("Exception: " + t.getCanonicalText() +
+                    ", Exception category: " + getExceptionCategory(t) +
+                    ", Exception source: " + getExceptionSource(t));
         }
+        logger.debug("Presentable exception types: " + getPresentableExceptionTypes());
+        logger.debug("Presentable exception category: " + getPresentableExceptionCategory());
+        logger.debug("Presentable exception source: " + getPresentableExceptionSource());
+
         /*
         for (PsiMethod m : exceptionMethods) {
             getMethodSource(m);
         } */
+        logger.debug("Exception methods: " + getPresentableExceptionMethods());
+        logger.debug("Method source: " + getPresentableMethodSource());
 
     }
 
@@ -103,7 +111,7 @@ public class ExceptionLoggingMetrics {
         for (PsiType e : exceptionTypes) {
             if (category == null) {
                 category = new String(getExceptionCategory(e).name());
-            } else if (!category.equals(getExceptionSource(e).name())) {
+            } else if (!category.equals(getExceptionCategory(e).name())) {
                 return "MIXED";
             }
         }
