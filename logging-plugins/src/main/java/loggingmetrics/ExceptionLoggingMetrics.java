@@ -32,15 +32,16 @@ public class ExceptionLoggingMetrics {
         project = logStmt.getProject();
 
         // debugging
-        /*
+
         for (PsiType t : exceptionTypes) {
             //logger.debug("Type name: " + t.getCanonicalText() + ", type class: " + getExceptionClass(t).getQualifiedName());
-            getExceptionSource(t);
-        } */
-
+            //getExceptionSource(t);
+            logger.debug("Exception: " + t.getCanonicalText() + ", Exception category: " + getExceptionCategory(t));
+        }
+        /*
         for (PsiMethod m : exceptionMethods) {
             getMethodSource(m);
-        }
+        } */
 
     }
 
@@ -89,12 +90,33 @@ public class ExceptionLoggingMetrics {
         return source;
     }
 
+    private ExceptionCategory getExceptionCategory(PsiType ex) {
+        String runtimeExStr = "java.lang.RuntimeException";
+        String errorExStr = "java.lang.Error";
+
+        if (ex.getCanonicalText().equals(runtimeExStr)) {
+            return ExceptionCategory.RUNTIME;
+        } else if (ex.getCanonicalText().equals(errorExStr)) {
+            return ExceptionCategory.ERROR;
+        }
+
+        PsiType[] superTypes = ex.getSuperTypes();
+        for (PsiType t : superTypes) {
+            if (t.getCanonicalText().equals(runtimeExStr)) {
+                return ExceptionCategory.RUNTIME;
+            } else if (t.getCanonicalText().equals(errorExStr)) {
+                return ExceptionCategory.ERROR;
+            }
+        }
+        return ExceptionCategory.NORMAL;
+    }
+
     private ReferenceSource getMethodSource(PsiMethod method) {
         VirtualFile vf = method.getContainingFile().getVirtualFile();
         ReferenceSource source = getReferenceSourceOfVirtualFile(vf);
 
-        logger.debug("Method: " + method.getContainingClass().getQualifiedName() + "." + method.getName() +
-                ", source: " + source);
+        //logger.debug("Method: " + method.getContainingClass().getQualifiedName() + "." + method.getName() +
+        //        ", source: " + source);
         return source;
     }
 

@@ -21,6 +21,7 @@ Exception type // how serious the problem is (need to consider exception class h
                                              // there are some conflicts, e.g., BinaryProtocol.ProtocolException versus the Java language one.
 Is exception type from java-lang / third-party library / project?
 Is check exception / runtime exception / error?
+Number of caught exceptions
 Is caught exception a super class of the thrown exception?
 Is contained in loop (two metrics) // how the logging would be replicated
   > is logging statement inside a loop in catch block?
