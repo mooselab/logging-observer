@@ -78,6 +78,54 @@ public class ExceptionLoggingMetrics {
         }
     }
 
+    public String getPresentableExceptionSource() {
+        if (exceptionTypes.size() == 1) {
+            return getExceptionSource(exceptionTypes.get(0)).name();
+        }
+        // if all sources are the same, return the source; otherwise return "MIXED"
+        String source = null;
+        for (PsiType e: exceptionTypes) {
+            if (source == null) {
+                source = new String(getExceptionSource(e).name());
+            } else if (!source.equals(getExceptionSource(e).name())) {
+                return "MIXED";
+            }
+        }
+        return source;
+    }
+
+    public String getPresentableExceptionCategory() {
+        if (exceptionTypes.size() == 1) {
+            return getExceptionCategory(exceptionTypes.get(0)).name();
+        }
+        // if all categories are the same, return the category; otherwise return "MIXED"
+        String category = null;
+        for (PsiType e : exceptionTypes) {
+            if (category == null) {
+                category = new String(getExceptionCategory(e).name());
+            } else if (!category.equals(getExceptionSource(e).name())) {
+                return "MIXED";
+            }
+        }
+        return category;
+    }
+
+    public String getPresentableMethodSource() {
+        if (exceptionMethods.size() == 1) {
+            return getMethodSource(exceptionMethods.get(0)).name();
+        }
+        // if all sources are the same, return the source; otherwise return "MIXED"
+        String source = null;
+        for (PsiMethod m : exceptionMethods) {
+            if (source == null) {
+                source = new String(getMethodSource(m).name());
+            } else if (!source.equals(getMethodSource(m).name())) {
+                return "MIXED";
+            }
+        }
+        return source;
+    }
+
     private ReferenceSource getExceptionSource(PsiType ex) {
         PsiClass exClass = ((PsiClassType)ex).resolve();
         VirtualFile vf = exClass.getContainingFile().getVirtualFile();
