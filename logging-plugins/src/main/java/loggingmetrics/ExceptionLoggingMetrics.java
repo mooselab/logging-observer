@@ -53,6 +53,35 @@ public class ExceptionLoggingMetrics {
         */
     }
 
+    public static String getLoggingMetricsHeader() {
+        List<String> metricsHeader = new ArrayList<>();
+        metricsHeader.add("exceptionType"); // exceptions caught by the containing catch block
+        metricsHeader.add("exceptionCategory"); // Normal exception, RuntimeException, or Error
+        metricsHeader.add("exceptionSource"); // project, library, or JDK
+        metricsHeader.add("exceptionNum"); // number of exceptions caught by the containing catch block
+        metricsHeader.add("methodCall"); // method call that throws the caught exceptions
+        metricsHeader.add("methodSource"); // project, library, or JDK
+        metricsHeader.add("methodNum"); // number of methods that throw the caught exceptions
+        metricsHeader.add("catchInLoop"); // if the containing catch block is in a loop
+        metricsHeader.add("isLogInLoop"); // if the logging statement is in a loop within the containing catch block
+
+        return String.join(",", metricsHeader);
+    }
+
+    public String getLoggingMetrics() {
+        List<String> metrics = new ArrayList<>();
+        metrics.add(getPresentableExceptionTypes());
+        metrics.add(getPresentableExceptionCategory());
+        metrics.add(getPresentableExceptionSource());
+        metrics.add(String.valueOf(getExceptionTypes().size()));
+        metrics.add(getPresentableExceptionMethods());
+        metrics.add(getPresentableMethodSource());
+        metrics.add(String.valueOf(getExceptionMethods().size()));
+        metrics.add(String.valueOf(isCatchBlockWithInLoop()));
+
+        return String.join(",",metrics);
+    }
+
     public List<PsiType> getExceptionTypes() {return exceptionTypes;}
     public List<PsiMethod> getExceptionMethods() {return exceptionMethods;}
 
@@ -84,32 +113,6 @@ public class ExceptionLoggingMetrics {
                     map(m -> m.getName()).
                     reduce("", (a,b) -> a + " " +b );*/
         }
-    }
-
-    public static String getLoggingMetricsHeader() {
-        List<String> metricsHeader = new ArrayList<>();
-        metricsHeader.add("exceptionType"); // exceptions caught by the containing catch block
-        metricsHeader.add("exceptionCategory"); // Normal exception, RuntimeException, or Error
-        metricsHeader.add("exceptionSource"); // project, library, or JDK
-        metricsHeader.add("exceptionNum"); // number of exceptions caught by the containing catch block
-        metricsHeader.add("methodCall"); // method call that throws the caught exceptions
-        metricsHeader.add("methodSource"); // project, library, or JDK
-        metricsHeader.add("methodNum"); // number of methods that throw the caught exceptions
-
-        return String.join(",", metricsHeader);
-    }
-
-    public String getLoggingMetrics() {
-        List<String> metrics = new ArrayList<>();
-        metrics.add(getPresentableExceptionTypes());
-        metrics.add(getPresentableExceptionCategory());
-        metrics.add(getPresentableExceptionSource());
-        metrics.add(String.valueOf(getExceptionTypes().size()));
-        metrics.add(getPresentableExceptionMethods());
-        metrics.add(getPresentableMethodSource());
-        metrics.add(String.valueOf(getExceptionMethods().size()));
-
-        return String.join(",",metrics);
     }
 
     public String getPresentableExceptionSource() {
@@ -158,6 +161,44 @@ public class ExceptionLoggingMetrics {
             }
         }
         return source;
+    }
+
+    public boolean isCatchBlockWithInLoop() {
+        // catch clause
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return false;
+        }
+
+        // containing loop statement of the catch block
+        PsiLoopStatement loop = PsiTreeUtil.getParentOfType(catchSection, PsiLoopStatement.class);
+
+        if (loop != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * If the logging statement is within a loop inside the containing catch block
+     */
+    public boolean isLoggingStatementWithinLoop() {
+        // catch clause
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
+
+        // containing loop statement of the logging statement
+        PsiLoopStatement loop = PsiTreeUtil.getParentOfType(logStmt, PsiLoopStatement.class);
+
+        if (loop == null) {
+            return false;
+        }
+
+        // if the containing loop is inside the containing catch block
+        if (PsiTreeUtil.isAncestor(catchSection, loop, true)) {
+            return true;
+        }
+        return false;
     }
 
     private ReferenceSource getExceptionSource(PsiType ex) {
