@@ -80,7 +80,7 @@ public class SearchExceptionLogging extends AnAction {
 
             loggingStatementsStr.append(metrics.getLoggingMetrics()).append("\n");
         }
-        logger.info("Logging statements: \n" + loggingStatementsStr);
+        logger.info("Exception logging metrics: \n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, exceptionLogs);

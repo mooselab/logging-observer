@@ -4,6 +4,7 @@ import com.intellij.openapi.roots.*;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.openapi.project.Project;
 
@@ -20,7 +21,7 @@ public class ExceptionLoggingMetrics {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionLoggingMetrics.class);
 
     private PsiMethodCallExpression logStmt;
-    private LogLevel logLevel;
+    String logLevel;
     private boolean isStackTraceLogged;
     private List<PsiType> exceptionTypes;
     private List<PsiMethod> exceptionMethods;
@@ -31,6 +32,8 @@ public class ExceptionLoggingMetrics {
         this.exceptionTypes = deriveExceptionTypes(logStmt);
         this.exceptionMethods = deriveExceptionMethods(logStmt);
         this.project = logStmt.getProject();
+        this.logLevel = extractLogLevel(logStmt);
+        this.isStackTraceLogged = deriveIsStackTraceLogged(logStmt);
 
         // debugging
         /*
@@ -93,7 +96,8 @@ public class ExceptionLoggingMetrics {
         metrics.add(psiFile.getVirtualFile().getName() + ":" + lineNumber);
 
         // response variables
-
+        metrics.add(getLogLevel());
+        metrics.add(String.valueOf(getIsStackTraceLogged()));
 
         //explanatory variables
         metrics.add(getPresentableExceptionTypes());
@@ -125,7 +129,7 @@ public class ExceptionLoggingMetrics {
     public List<PsiType> getExceptionTypes() {return this.exceptionTypes;}
     public List<PsiMethod> getExceptionMethods() {return this.exceptionMethods;}
 
-    public LogLevel getLogLevel() { return this.logLevel; }
+    public String getLogLevel() { return this.logLevel; }
 
     public boolean getIsStackTraceLogged() { return this.isStackTraceLogged; }
 
@@ -434,24 +438,14 @@ public class ExceptionLoggingMetrics {
     }
 
     private ExceptionCategory getExceptionCategory(PsiType ex) {
-        String runtimeExStr = "java.lang.RuntimeException";
-        String errorExStr = "java.lang.Error";
 
-        if (ex.getCanonicalText().equals(runtimeExStr)) {
+        if (isRuntimeExceptionType(ex)) {
             return ExceptionCategory.RUNTIME;
-        } else if (ex.getCanonicalText().equals(errorExStr)) {
+        } else if (isErrorType(ex)) {
             return ExceptionCategory.ERROR;
+        } else {
+            return ExceptionCategory.NORMAL;
         }
-
-        PsiType[] superTypes = ex.getSuperTypes();
-        for (PsiType t : superTypes) {
-            if (t.getCanonicalText().equals(runtimeExStr)) {
-                return ExceptionCategory.RUNTIME;
-            } else if (t.getCanonicalText().equals(errorExStr)) {
-                return ExceptionCategory.ERROR;
-            }
-        }
-        return ExceptionCategory.NORMAL;
     }
 
     private ReferenceSource getMethodSource(PsiMethod method) {
@@ -584,7 +578,7 @@ public class ExceptionLoggingMetrics {
             boolean match = false;
             for (PsiType throwsType: throwsTypes) {
                 for (PsiType caughtType : this.exceptionTypes) {
-                    if (isSubTypeOrSameType(throwsType, caughtType)) {
+                    if (isSubType(throwsType, caughtType, false)) {
                         exMethods.add(method);
                         match = true;
                         break;
@@ -598,16 +592,121 @@ public class ExceptionLoggingMetrics {
         return exMethods;
     }
 
-    private boolean isSubTypeOrSameType(PsiType child, PsiType parent) {
+    /**
+     * Recursively check if a type is a sub-type of another type
+     * @param child
+     * @param parent
+     * @param strict: true -> returns false for same type; false -> return true for same type.
+     * @return
+     */
+    private boolean isSubType(PsiType child, PsiType parent, boolean strict) {
+
         if (child.getCanonicalText().equals(parent.getCanonicalText())) {
-            return true;
+            if (strict) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
         PsiType[] superTypes = child.getSuperTypes();
-        for (PsiType superT : superTypes) {
-            if (superT.getCanonicalText().equals(parent.getCanonicalText())) {
+        for (PsiType t : superTypes) {
+            if (t.getCanonicalText().equals(parent.getCanonicalText()) ||
+                    isSubType(t, parent, true)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    private boolean isThrowableType(PsiType t) {
+        /*
+        String throwableText = "java.lang.Throwable";
+        if (t.getCanonicalText().equals(throwableText)) {
+            return true;
+        }
+
+        PsiType[] superTypes = t.getSuperTypes();
+        logger.debug("Throwable: " + throwableText);
+        for (PsiType superT : superTypes) {
+            logger.debug("Super type: " + superT.getCanonicalText());
+            if (superT.getCanonicalText().equals(throwableText)) {
+                return true;
+            }
+        }
+        return false;
+        */
+        PsiType throwable = PsiType.getTypeByName("java.lang.Throwable", this.project,
+                GlobalSearchScope.allScope(this.project));
+        return isSubType(t, throwable, false);
+    }
+
+    private boolean isRuntimeExceptionType(PsiType t) {
+        PsiType runtimeException = PsiType.getTypeByName("java.lang.RuntimeException", this.project,
+                GlobalSearchScope.allScope(this.project));
+        return isSubType(t, runtimeException, false);
+    }
+
+    private boolean isErrorType(PsiType t) {
+        PsiType error = PsiType.getTypeByName("java.lang.Error", this.project,
+                GlobalSearchScope.allScope(this.project));
+        return isSubType(t, error, false);
+    }
+
+    private String extractLogLevel(PsiMethodCallExpression logStmt) {
+        PsiReferenceExpression methodCall = logStmt.getMethodExpression();
+        String logMethodName = PsiTreeUtil.getChildOfType(methodCall, PsiIdentifier.class).getText();
+        return logMethodName;
+    }
+
+    private boolean deriveIsStackTraceLogged(PsiMethodCallExpression logStmt) {
+        // exception variable of the containing catch block
+        // catch session
+        /*
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return false;
+        }
+        PsiParameter exPara = PsiTreeUtil.getChildOfType(catchSection, PsiParameter.class);
+        if (exPara == null) {
+            return false;
+        }
+        String exName = PsiTreeUtil.getChildOfType(exPara, PsiIdentifier.class).getText();
+        */
+
+        // parameter lists of the logging statement
+        PsiExpressionList expressionList = PsiTreeUtil.getChildOfType(logStmt, PsiExpressionList.class);
+
+        // PsiReferenceExpression parameters (parameters simply refer to other variables, no method invocation or calculation)
+        PsiReferenceExpression[] referenceExpressions = PsiTreeUtil.getChildrenOfType(expressionList,
+                PsiReferenceExpression.class);
+
+        if (referenceExpressions == null || referenceExpressions.length == 0) {
+            return false;
+        }
+        for (PsiReferenceExpression expr : referenceExpressions) {
+            PsiElement resolvedElement = expr.getReference().resolve();
+            //logger.debug("Resolved element: " + resolvedElement.getText());
+            if (resolvedElement instanceof PsiVariable) {
+                //logger.debug("Resolved element is a PsiVariable instance.");
+                try {
+                    PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                            PsiTypeElement.class).getType();
+                    //logger.debug("Variable type: " + variableType.getCanonicalText());
+                    if (isThrowableType(variableType)) {
+                        //logger.debug("Variable type : " + variableType.getCanonicalText() + " is Throwable");
+                        return true;
+                    }
+                } catch (NullPointerException e) {
+                    return false;
+                }
+            }
+            /*
+            String expressionName = PsiTreeUtil.getChildOfType(expr, PsiIdentifier.class).getText();
+            if (expressionName.equals(exName)) {
+                return true;
+            }
+            */
         }
         return false;
     }
