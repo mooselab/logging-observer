@@ -35,6 +35,7 @@ If the exception is re-thrown // re-thrown means the method pass the exception t
 Number of throw statements in the catch block
 Does the catch block have returns? // return might indicate an problem hard to handle
 Does the try block have returns? // return might indicate an important task failed to finish (e.g., fail to return)
+Does the try block have throw statements? // throw might indicate an serious error
 
 
 Challenges:

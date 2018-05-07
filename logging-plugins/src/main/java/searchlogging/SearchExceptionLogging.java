@@ -55,23 +55,28 @@ public class SearchExceptionLogging extends AnAction {
             }
         }
 
-        logger.debug("Metrics header: " + ExceptionLoggingMetrics.getLoggingMetricsHeader());
+        //logger.debug("Metrics header: " + ExceptionLoggingMetrics.getLoggingMetricsHeader());
 
         StringBuilder loggingStatementsStr = new StringBuilder();
+        loggingStatementsStr.append(ExceptionLoggingMetrics.getLoggingMetricsHeader()).append(("\n"));
         for (PsiMethodCallExpression log : exceptionLogs) {
+            /*
             PsiFile psiFile = log.getContainingFile();
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
             loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
+            */
 
             //logger.debug(psiFile.getVirtualFile().getPath() + ":" + lineNumber);
 
             ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
+            /*
             String typesStr = metrics.getPresentableExceptionTypes();
             loggingStatementsStr.append("Exception type: ").append(typesStr).append("\n");
             String methodsStr = metrics.getPresentableExceptionMethods();
             loggingStatementsStr.append("Exception methods: ").append(methodsStr).append("\n");
 
             loggingStatementsStr.append(log.getText()).append(("\n"));
+            */
 
             loggingStatementsStr.append(metrics.getLoggingMetrics()).append("\n");
         }
