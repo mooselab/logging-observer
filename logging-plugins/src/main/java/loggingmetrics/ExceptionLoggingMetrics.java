@@ -1,6 +1,7 @@
 package loggingmetrics;
 
 import com.intellij.openapi.roots.*;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -64,6 +65,15 @@ public class ExceptionLoggingMetrics {
         metricsHeader.add("methodNum"); // number of methods that throw the caught exceptions
         metricsHeader.add("catchInLoop"); // if the containing catch block is in a loop
         metricsHeader.add("isLogInLoop"); // if the logging statement is in a loop within the containing catch block
+        metricsHeader.add("numMethodCallsBeforeLogging"); // number of method calls in the containing catch block before the logging statement
+        metricsHeader.add("numMethodCallsAfterLogging"); // number of method calls in the containing catch block after the logging statement
+        metricsHeader.add("LOCBeforeLogging"); // lines of code in the containing catch block before the logging statement
+        metricsHeader.add("LOCAfterLogging"); // lines of code the containing block after the logging statement
+        metricsHeader.add("numMethodCallsInTryBlock"); // number of method calls in the containing try block
+        metricsHeader.add("isLogInBranch"); // if the logging statement is in a branch statement within the containing catch block
+        metricsHeader.add("thrownInCatchBlock"); // does the catch block contain throw statements
+        metricsHeader.add("returnInCatchBlock"); // does the catch block contain return statements
+        metricsHeader.add("returnInTryBlock"); // does the try block contain return statements
 
         return String.join(",", metricsHeader);
     }
@@ -78,7 +88,13 @@ public class ExceptionLoggingMetrics {
         metrics.add(getPresentableMethodSource());
         metrics.add(String.valueOf(getExceptionMethods().size()));
         metrics.add(String.valueOf(isCatchBlockWithInLoop()));
-
+        metrics.add(String.valueOf(isLoggingStatementWithinLoop()));
+        int[] numMethodCalls = getNumMethodCallsBeforeAndAfterLogging();
+        metrics.add(String.valueOf(numMethodCalls[0]));
+        metrics.add(String.valueOf(numMethodCalls[1]));
+        int[] LOCs = getLOCBeforeAndAfterLogging();
+        metrics.add(String.valueOf(LOCs[0]));
+        metrics.add(String.valueOf(LOCs[1]));
         return String.join(",",metrics);
     }
 
@@ -199,6 +215,71 @@ public class ExceptionLoggingMetrics {
             return true;
         }
         return false;
+    }
+
+    /**
+     *
+     * @return numMethodCalls:
+     * Index 0: number of method calls in the containing catch block that are before the logging statement;
+     * Index 1: number of method calls in the containing catch block that are after the logging statement.
+     */
+    public int[] getNumMethodCallsBeforeAndAfterLogging() {
+        // catch session
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return new int[2];
+        }
+
+        // catch-block
+        PsiCodeBlock catchBlock = PsiTreeUtil.getChildOfType(catchSection, PsiCodeBlock.class);
+
+        // method calls in the catch block
+        Collection<PsiMethodCallExpression> methodCalls = PsiTreeUtil.findChildrenOfType(catchBlock, PsiMethodCallExpression.class);
+
+        // position of the logging statement
+        int log_start_offset =logStmt.getTextOffset();
+        int log_end_offset = log_start_offset + logStmt.getTextLength() - 1;
+
+        int[] numMethodCalls = new int[]{0, 0}; // index 0: number of method calls before the logging statement; index 1: after.
+        for (PsiMethodCallExpression m : methodCalls) {
+            int method_offset = m.getTextOffset();
+            if (method_offset < log_start_offset) {
+                numMethodCalls[0] += 1;
+            } else if (method_offset > log_end_offset) {
+                numMethodCalls[1] += 1;
+            }
+        }
+        return numMethodCalls;
+    }
+
+    public int[] getLOCBeforeAndAfterLogging() {
+        // catch session
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return new int[2];
+        }
+
+        // catch-block
+        PsiCodeBlock catchBlock = PsiTreeUtil.getChildOfType(catchSection, PsiCodeBlock.class);
+
+        // position of the catch block
+        int catch_start_offset = catchBlock.getTextOffset();
+        int catch_end_offset = catch_start_offset + catchBlock.getTextLength() - 1;
+        PsiFile file = catchBlock.getContainingFile();
+        int catch_start_line = StringUtil.offsetToLineNumber(file.getText(), catch_start_offset) + 1;
+        int catch_end_line = StringUtil.offsetToLineNumber(file.getText(), catch_end_offset) + 1;
+
+        // position of the logging statement
+        int log_start_offset =logStmt.getTextOffset();
+        int log_end_offset = log_start_offset + logStmt.getTextLength() - 1;
+        int log_start_line = StringUtil.offsetToLineNumber(file.getText(), log_start_offset) + 1;
+        int log_end_line = StringUtil.offsetToLineNumber(file.getText(), log_end_offset) + 1;
+
+        int[] LOCs = new int[2];
+        LOCs[0] = log_start_line - catch_start_line - 1;// loc before logging statement
+        LOCs[1] = catch_end_line - log_end_line - 1; // loc after logging statement
+
+        return LOCs;
     }
 
     private ReferenceSource getExceptionSource(PsiType ex) {
