@@ -14,17 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 // logger for development environment, configured in this plugin project's resources/logback.xml file
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 // logger for integrated plugin environment, configured in intellij's bin/log.xml file
-//import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.diagnostic.Logger;
 
 public class SearchExceptionLogging extends AnAction {
     // slf4j logger for development environment, configured in this plugin project's resources/logback.xml file
-    private static final Logger logger = LoggerFactory.getLogger(SampleLoggingUsages.class);
+    //private static final Logger logger = LoggerFactory.getLogger(SampleLoggingUsages.class);
 
     // intellij logger for integrated plugin environment, configured in intellij's bin/log.xml file
-    //private static final Logger logger = Logger.getInstance(SearchLoggingUsages.class);
+    private static final Logger logger = Logger.getInstance(SearchLoggingUsages.class);
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {

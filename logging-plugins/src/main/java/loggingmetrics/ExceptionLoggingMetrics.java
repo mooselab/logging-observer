@@ -72,17 +72,19 @@ public class ExceptionLoggingMetrics {
         metricsHeader.add("exceptionMethodSource"); // project, library, or JDK
         metricsHeader.add("exceptionMethodNum"); // number of methods that throw the caught exceptions
         metricsHeader.add("catchInLoop"); // if the containing catch block is in a loop
-        metricsHeader.add("isLogInLoop"); // if the logging statement is in a loop within the containing catch block
+        metricsHeader.add("isLogInInnerLoop"); // if the logging statement is in a loop within the containing catch block
+        metricsHeader.add("isLogInInnerBranch"); // if the logging statement is in a branch statement (excluding logging guard) within the containing catch block
+        metricsHeader.add("isLogInInnerTryBlock"); // if the logging statement is in a try block within the containing catch block (i.e., an inner try - finally block without catch block)
+        metricsHeader.add("throwInCatchBlock"); // does the catch block contain throw statements
+        metricsHeader.add("returnInCatchBlock"); // does the catch block contain return statements
+        metricsHeader.add("throwInTryBlock"); // does the try block contain throw statements
+        metricsHeader.add("returnInTryBlock"); // does the try block contain return statements
         metricsHeader.add("numMethodCallsBeforeLogging"); // number of method calls in the containing catch block before the logging statement
         metricsHeader.add("numMethodCallsAfterLogging"); // number of method calls in the containing catch block after the logging statement
         metricsHeader.add("LOCBeforeLogging"); // lines of code in the containing catch block before the logging statement
         metricsHeader.add("LOCAfterLogging"); // lines of code the containing block after the logging statement
         metricsHeader.add("numMethodCallsInTryBlock"); // number of method calls in the containing try block
-        metricsHeader.add("isLogInBranch"); // if the logging statement is in a branch statement (excluding logging guard) within the containing catch block
-        metricsHeader.add("throwInCatchBlock"); // does the catch block contain throw statements
-        metricsHeader.add("returnInCatchBlock"); // does the catch block contain return statements
-        metricsHeader.add("throwInTryBlock"); // does the try block contain throw statements
-        metricsHeader.add("returnInTryBlock"); // does the try block contain return statements
+
 
         return String.join(",", metricsHeader);
     }
@@ -108,7 +110,13 @@ public class ExceptionLoggingMetrics {
         metrics.add(getPresentableExceptionMethodSource());
         metrics.add(String.valueOf(getExceptionMethods().size()));
         metrics.add(String.valueOf(isCatchBlockWithInLoop()));
-        metrics.add(String.valueOf(isLoggingStatementWithinLoop()));
+        metrics.add(String.valueOf(isLoggingStatementWithinInnerLoop()));
+        metrics.add(String.valueOf(isLoggingStatementWithinInnerBranch()));
+        metrics.add(String.valueOf(isLoggingStatementWithinInnderTryBlock()));
+        metrics.add(String.valueOf(getNumThrowInCatchBlock() > 0));
+        metrics.add(String.valueOf(getNumReturnInCatchBlock() > 0));
+        metrics.add(String.valueOf(getNumThrowInTryBlock() > 0));
+        metrics.add(String.valueOf(getNumReturnInTryBlock() > 0));
         int[] numMethodCalls = getNumMethodCallsBeforeAndAfterLogging();
         metrics.add(String.valueOf(numMethodCalls[0]));
         metrics.add(String.valueOf(numMethodCalls[1]));
@@ -116,11 +124,7 @@ public class ExceptionLoggingMetrics {
         metrics.add(String.valueOf(LOCs[0]));
         metrics.add(String.valueOf(LOCs[1]));
         metrics.add(String.valueOf(getNumMethodCallsInTryBlock()));
-        metrics.add(String.valueOf(isLoggingStatementWithinBranch()));
-        metrics.add(String.valueOf(getNumThrowInCatchBlock() > 0));
-        metrics.add(String.valueOf(getNumReturnInCatchBlock() > 0));
-        metrics.add(String.valueOf(getNumThrowInTryBlock() > 0));
-        metrics.add(String.valueOf(getNumReturnInTryBlock() > 0));
+
 
 
         return String.join(",",metrics);
@@ -235,7 +239,7 @@ public class ExceptionLoggingMetrics {
     /**
      * If the logging statement is within a loop inside the containing catch block
      */
-    public boolean isLoggingStatementWithinLoop() {
+    public boolean isLoggingStatementWithinInnerLoop() {
         // catch clause
         PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
 
@@ -256,7 +260,7 @@ public class ExceptionLoggingMetrics {
     /**
      * If the logging statement is within a branch (excluding logging guard) inside the containing catch block
      */
-    public boolean isLoggingStatementWithinBranch() {
+    public boolean isLoggingStatementWithinInnerBranch() {
         // catch clause
         PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
 
@@ -285,6 +289,24 @@ public class ExceptionLoggingMetrics {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean isLoggingStatementWithinInnderTryBlock() {
+        // catch clause
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
+
+        // containing loop statement of the logging statement
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(this.logStmt, PsiTryStatement.class);
+
+        if (tryStatement == null) {
+            return false;
+        }
+
+        // if the containing loop is inside the containing catch block
+        if (PsiTreeUtil.isAncestor(catchSection, tryStatement, true)) {
+            return true;
+        }
         return false;
     }
 
@@ -354,8 +376,14 @@ public class ExceptionLoggingMetrics {
     }
 
     public int getNumMethodCallsInTryBlock() {
+        // containing catch block
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return 0;
+        }
+
         // try statement
-        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(this.logStmt, PsiTryStatement.class);
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(catchSection, PsiTryStatement.class);
         if (tryStatement == null) {
             return 0;
         }
@@ -392,8 +420,14 @@ public class ExceptionLoggingMetrics {
     }
 
     public int getNumReturnInTryBlock() {
+        // containing catch block
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return 0;
+        }
+
         // try statement
-        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(this.logStmt, PsiTryStatement.class);
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(catchSection, PsiTryStatement.class);
         if (tryStatement == null) {
             return 0;
         }
@@ -409,8 +443,14 @@ public class ExceptionLoggingMetrics {
     }
 
     public int getNumThrowInTryBlock() {
+        // containing catch block
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return 0;
+        }
+
         // try statement
-        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(this.logStmt, PsiTryStatement.class);
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(catchSection, PsiTryStatement.class);
         if (tryStatement == null) {
             return 0;
         }
@@ -427,6 +467,9 @@ public class ExceptionLoggingMetrics {
 
     private ReferenceSource getExceptionSource(PsiType ex) {
         PsiClass exClass = ((PsiClassType)ex).resolve();
+        if (exClass == null) {
+            return ReferenceSource.UNKNOWN;
+        }
         VirtualFile vf = exClass.getContainingFile().getVirtualFile();
         //logger.debug("Virtual file: " + vf.getCanonicalPath());
         ReferenceSource source = getReferenceSourceOfVirtualFile(vf);
@@ -438,7 +481,6 @@ public class ExceptionLoggingMetrics {
     }
 
     private ExceptionCategory getExceptionCategory(PsiType ex) {
-
         if (isRuntimeExceptionType(ex)) {
             return ExceptionCategory.RUNTIME;
         } else if (isErrorType(ex)) {
@@ -530,8 +572,14 @@ public class ExceptionLoggingMetrics {
     private List<PsiMethod> deriveExceptionMethods(PsiMethodCallExpression logStmt) {
         List<PsiMethod> exMethods = new ArrayList<>();
 
+        // containing catch block
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return null;
+        }
+
         // try statement
-        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(logStmt, PsiTryStatement.class);
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(catchSection, PsiTryStatement.class);
         if (tryStatement == null) {
             return null;
         }
@@ -553,7 +601,9 @@ public class ExceptionLoggingMetrics {
             //PsiType[] throwsTypes = method.getThrowsList().getReferencedTypes();
             //logger.debug("Throws: " + Arrays.stream(throwsTypes).map(t -> t.getCanonicalText()).
             //        reduce("", (a, b) -> a + " " + b ));
-            methods.add(method);
+            if (method != null) {
+                methods.add(method);
+            }
         }
         // resolve new expressions to method declarations (i.e., constructor declarations)
         for (PsiNewExpression newExpr : newExpressions) {
