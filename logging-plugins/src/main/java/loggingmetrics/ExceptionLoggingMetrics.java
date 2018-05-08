@@ -273,8 +273,14 @@ public class ExceptionLoggingMetrics {
             PsiMethodCallExpression firstMethodCall = PsiTreeUtil.getChildOfType(ifStatement, PsiMethodCallExpression.class);
             if (firstMethodCall != null) {
                 PsiMethod method = (PsiMethod) (firstMethodCall.getMethodExpression().resolve());
-                if (method.getContainingClass().getName().equals("Logger")) {
-                    ifStatement = PsiTreeUtil.getParentOfType(ifStatement, PsiIfStatement.class);
+                if (method != null) {
+                    try {
+                        if (method.getContainingClass().getName().equals("Logger")) {
+                            ifStatement = PsiTreeUtil.getParentOfType(ifStatement, PsiIfStatement.class);
+                        }
+                    } catch (NullPointerException e) {
+                        logger.warn("Cannot get containing class of method " + method.getName());
+                    }
                 }
             }
         }
