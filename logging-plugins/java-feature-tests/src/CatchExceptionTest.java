@@ -7,9 +7,11 @@ public class CatchExceptionTest {
         System.out.println("Start to test exception catching mechanism ...");
         try {
             exceptionThrowingMethod();
+            throw new FileNotFoundException("Blabla.");
         } catch (FileNotFoundException e) {
             System.out.println("Caught FileNotFoundException.");
             System.out.println(e.toString());
+            //throw new FileNotFoundException("File not found exception in catch block.");
         } catch (IOException e) {
             System.out.println("Caught IOException");
             System.out.println(e.toString());

@@ -299,7 +299,7 @@ public class ExceptionLoggingMetrics {
                             ifStatement = PsiTreeUtil.getParentOfType(ifStatement, PsiIfStatement.class);
                         }
                     } catch (NullPointerException e) {
-                        logger.warn("Cannot get containing class of method " + method.getName());
+                        //logger.warn("Cannot get containing class of method " + method.getName());
                     }
                 }
             }
@@ -619,8 +619,6 @@ public class ExceptionLoggingMetrics {
         }
 
 
-
-
         // exceptions caught by prior sibling catches
         PsiCatchSection[] siblingCatches = PsiTreeUtil.getChildrenOfType(tryStatement, PsiCatchSection.class);
         List<PsiType> priorSiblingCaughtExceptions = new ArrayList<>();
@@ -631,19 +629,70 @@ public class ExceptionLoggingMetrics {
         }
 
         // exceptions caught by all prior catches (including sibling catches and internal catches)
-        Collection<PsiCatchSection> allCatches = PsiTreeUtil.findChildrenOfType(tryStatement, PsiCatchSection.class);
+        Collection<PsiCatchSection> allPriorCatches = PsiTreeUtil.findChildrenOfType(tryStatement, PsiCatchSection.class);
+        allPriorCatches.removeIf(c -> {
+            return c.getTextOffset() >= catchSection.getTextOffset();
+        });
+
+        /*
         List<PsiType> priorCaughtExceptions = new ArrayList<>();
         for (PsiCatchSection c : allCatches) {
             if (c.getTextOffset() < catchSection.getTextOffset()) { // prior catch clause
                 priorCaughtExceptions.addAll(extractExceptionTypesForCatchSection(c));
             }
         }
+        */
 
 
         // try-block
         PsiCodeBlock tryBlock = PsiTreeUtil.getChildOfType(tryStatement, PsiCodeBlock.class);
 
-        // exceptions thrown in the try block
+        // checked if the caught exceptions are thrown in the containing try block
+
+        Collection<PsiThrowStatement> throwStatements = PsiTreeUtil.findChildrenOfType(tryBlock, PsiThrowStatement.class);
+        for (PsiThrowStatement throwS : throwStatements) {
+            PsiNewExpression newExpr = PsiTreeUtil.findChildOfType(throwS, PsiNewExpression.class);
+            PsiClass exClass = (PsiClass) newExpr.getClassReference().resolve();
+            //logger.debug("New expression: " + newExpr.getText() + ", Exception Class name: " + exClass.getQualifiedName());
+            PsiType thrownExType = getPsiTypeByQualifiedName(exClass.getQualifiedName());
+            if (thrownExType == null) continue;
+
+            // CHeck if the thrown exception is caught by prior catches
+            boolean caughtByPriorCatches = false;
+            for (PsiCatchSection priorCatch : allPriorCatches) {
+                // Check if the prior catch is able to catch the thrown exception
+                // (exception is thrown within the corresponding try block
+                PsiTryStatement matchingTryStmt = PsiTreeUtil.getParentOfType(priorCatch, PsiTryStatement.class);
+                PsiCodeBlock matchingTryBlock = PsiTreeUtil.getChildOfType(matchingTryStmt, PsiCodeBlock.class);
+                if (!PsiTreeUtil.isAncestor(matchingTryBlock, throwS, true)) {
+                    continue;
+                }
+
+                // check if the prior caught exceptions match the thrown exception
+                List<PsiType> caughtTypes = extractExceptionTypesForCatchSection(priorCatch);
+                for (PsiType caughtType : caughtTypes) {
+                    if (isSubType(thrownExType, caughtType, false)) {
+                        caughtByPriorCatches = true;
+                        break;
+                    }
+                }
+                if (caughtByPriorCatches) break;
+            }
+
+            if (caughtByPriorCatches) continue;
+
+            // Check if the thrown exception is caught by current catch
+            boolean caughtByCurrentCatch = false;
+            for (PsiType caughtType : this.exceptionTypes) {
+                if (isSubType(thrownExType, caughtType, false)) {
+                    PsiMethod method = PsiTreeUtil.getParentOfType(throwS, PsiMethod.class);
+                    exMethods.add(method);
+                    caughtByCurrentCatch = true;
+                    break;
+                }
+            }
+            if (caughtByCurrentCatch) break;
+        }
 
         // method calls in the try block
         Collection<PsiMethodCallExpression> methodCalls = PsiTreeUtil.findChildrenOfType(tryBlock, PsiMethodCallExpression.class);
@@ -651,15 +700,138 @@ public class ExceptionLoggingMetrics {
         // new expressions (e.g., new LdapName(dn)) can also throw exceptions
         Collection<PsiNewExpression> newExpressions = PsiTreeUtil.findChildrenOfType(tryBlock, PsiNewExpression.class);
 
+        // combine method calls and new expressions
+        List<PsiCallExpression> callExpressions = new ArrayList<>();
+        callExpressions.addAll(methodCalls);
+        callExpressions.addAll(newExpressions);
+
+        // if there is no method call, return
+        if (callExpressions.size() == 0) return exMethods;
+
+        // if there is only one method call in the try block, then it is the exception throwing method
+        if (exMethods.size() == 0  && callExpressions.size() == 1) {
+            PsiMethod method = callExpressions.get(0).resolveMethod();
+            if (method != null) {
+                exMethods.add(method);
+                return exMethods;
+            }
+        }
+
+        // Check if the caught exceptions are specified in methods' throws list
+
+        // Match exceptions with methods inside the try block
+        // Caught exception is equal to or is parent of method-specified exception
+        // Excluding exceptions that are caught by prior catches
+        for (PsiCallExpression callExpr : callExpressions) {
+            PsiMethod method = callExpr.resolveMethod();
+            if (method == null) continue;
+
+            PsiType[] throwsTypes = method.getThrowsList().getReferencedTypes();
+
+            for (PsiType throwsType: throwsTypes) {
+                // Check if the specified exception is caught by prior catches
+                boolean caughtByPriorCatches = false;
+                for (PsiCatchSection priorCatch : allPriorCatches) {
+                    // Check if the prior catch is able to catch the thrown exception
+                    // (exception is thrown within the corresponding try block
+                    PsiTryStatement matchingTryStmt = PsiTreeUtil.getParentOfType(priorCatch, PsiTryStatement.class);
+                    PsiCodeBlock matchingTryBlock = PsiTreeUtil.getChildOfType(matchingTryStmt, PsiCodeBlock.class);
+                    if (!PsiTreeUtil.isAncestor(matchingTryBlock, callExpr, true)) {
+                        continue;
+                    }
+
+                    // check if the prior caught exceptions match the thrown exception
+                    List<PsiType> caughtTypes = extractExceptionTypesForCatchSection(priorCatch);
+                    for (PsiType caughtType : caughtTypes) {
+                        if (isSubType(throwsType, caughtType, false)) {
+                            caughtByPriorCatches = true;
+                            break;
+                        }
+                    }
+                    if (caughtByPriorCatches) break;
+                }
+
+                if (caughtByPriorCatches) continue;
+
+                // Check if the specified exception is caught by the current catch
+                boolean caughtByCurrentCatch = false;
+                for (PsiType caughtType : this.exceptionTypes) {
+                    if (isSubType(throwsType, caughtType, false)) {
+                        exMethods.add(method);
+                        caughtByCurrentCatch = true;
+                        break;
+                    }
+                }
+                if (caughtByCurrentCatch) break;
+            }
+            //if (match) break; // only choose the first matching method.
+
+        }
+
+        // if caught exceptions are resolved to either throw statements or method calls, return the results
+        if (exMethods.size() > 0) {
+            return exMethods;
+        }
+
+        // If caught exceptions are not resolved, try something else (release the throw-throws-catch matching criterion)
+
+        // Child match (catch exception can be the child of a method-specified exception)
+        // In cases when the exception thrown at runtime can be the caught exception, even though the specified exception is the parent
+        for (PsiCallExpression callExpr : callExpressions) {
+            PsiMethod method = callExpr.resolveMethod();
+            if (method == null) continue;
+
+            PsiType[] throwsTypes = method.getThrowsList().getReferencedTypes();
+
+            for (PsiType throwsType: throwsTypes) {
+                // Check if the specified exception is caught by prior catches
+                boolean caughtByPriorCatches = false;
+                for (PsiCatchSection priorCatch : allPriorCatches) {
+                    // Check if the prior catch is able to catch the thrown exception
+                    // (exception is thrown within the corresponding try block
+                    PsiTryStatement matchingTryStmt = PsiTreeUtil.getParentOfType(priorCatch, PsiTryStatement.class);
+                    PsiCodeBlock matchingTryBlock = PsiTreeUtil.getChildOfType(matchingTryStmt, PsiCodeBlock.class);
+                    if (!PsiTreeUtil.isAncestor(matchingTryBlock, callExpr, true)) {
+                        continue;
+                    }
+
+                    // check if the prior caught exceptions match the thrown exception
+                    List<PsiType> caughtTypes = extractExceptionTypesForCatchSection(priorCatch);
+                    for (PsiType caughtType : caughtTypes) {
+                        if (isSubType(throwsType, caughtType, false)) {
+                            caughtByPriorCatches = true;
+                            break;
+                        }
+                    }
+                    if (caughtByPriorCatches) break;
+                }
+
+                if (caughtByPriorCatches) continue;
+
+                // Check if the specified exception is caught by the current catch
+                boolean caughtByCurrentCatch = false;
+                for (PsiType caughtType : this.exceptionTypes) {
+                    // release the throws-catch matching criterion
+                    if (isSubType(throwsType, caughtType, false) ||
+                            isSubType(caughtType, throwsType, true)) {
+                        exMethods.add(method);
+                        caughtByCurrentCatch = true;
+                        break;
+                    }
+                }
+                if (caughtByCurrentCatch) break;
+            }
+            //if (match) break; // only choose the first matching method.
+        }
+
+
+        /*
+
         // resolve method calls to method declarations
         List<PsiMethod> methods = new ArrayList<>();
         List<PsiMethod> innerTryMethods = new ArrayList<>();
         for (PsiMethodCallExpression methodCall : methodCalls) {
-            //logger.debug("Method call: " + methodCall.getText());
             PsiMethod method = (PsiMethod) (methodCall.getMethodExpression().resolve());
-            //PsiType[] throwsTypes = method.getThrowsList().getReferencedTypes();
-            //logger.debug("Throws: " + Arrays.stream(throwsTypes).map(t -> t.getCanonicalText()).
-            //        reduce("", (a, b) -> a + " " + b ));
             if (method == null) {
                 continue;
             }
@@ -676,9 +848,6 @@ public class ExceptionLoggingMetrics {
         // resolve new expressions to method declarations (i.e., constructor declarations)
         for (PsiNewExpression newExpr : newExpressions) {
             PsiMethod method = newExpr.resolveMethod();
-            //logger.debug("newExpression: " + newExpr.getText());
-            //logger.debug("resolvedMethod: " + newExpr.resolveMethod().getName());
-            //logger.debug("resolvedConsstructor: " + newExpr.resolveConstructor().getName());
             if (method == null) { // the resolved result can be null when a new expression is a anonymous class
                 continue;
             }
@@ -692,10 +861,9 @@ public class ExceptionLoggingMetrics {
             }
         }
 
-        // if there is only one method in the try block, then it is the exception throwing method
-        if (methods.size() + innerTryMethods.size() <= 1) {
-            return methods;
-        }
+        */
+
+        /*
 
         // select methods that declare exceptions same as the given exception type
 
@@ -732,6 +900,10 @@ public class ExceptionLoggingMetrics {
             return exMethods;
         }
 
+        */
+
+        /*
+
         // Second round: match exceptions with methods inside inner try blocks
         // Caught exception is equal to or is parent of method-specified exception
         // Excluding exceptions that are caught by all prior catches (sibling or inner catches)
@@ -765,6 +937,10 @@ public class ExceptionLoggingMetrics {
             return exMethods;
         }
 
+        */
+
+        /*
+
         // Third round: child match (catch exception is child of method-specified exception)
         // In cases when the exception thrown at runtime can be the caught exception,
         // even though the declared exception is the parent
@@ -795,6 +971,8 @@ public class ExceptionLoggingMetrics {
             }
             if (match) break; // only choose the first matching method.
         }
+
+        */
 
         /*
         // if no method matches the caught exceptions, use the first method in the try block
@@ -874,6 +1052,11 @@ public class ExceptionLoggingMetrics {
         PsiType exception = PsiType.getTypeByName("java.lang.Exception", this.project,
                 GlobalSearchScope.allScope(this.project));
         return isSubType(t, exception, true) && !isRuntimeExceptionType(t);
+    }
+
+    private PsiType getPsiTypeByQualifiedName(String typeQName) {
+        return PsiType.getTypeByName(typeQName, this.project,
+                GlobalSearchScope.allScope(this.project));
     }
 
     private String extractLogLevel(PsiMethodCallExpression logStmt) {
