@@ -1,8 +1,8 @@
 package loggingmetrics;
 
 public enum ExceptionCategory {
-    NORMAL,
+    CHECKED,
     RUNTIME,
     ERROR,
-    UNKNOWN
+    GENERAL
 }
