@@ -29,9 +29,9 @@ public class ExceptionLoggingMetrics {
 
     public ExceptionLoggingMetrics(PsiMethodCallExpression logStmt) {
         this.logStmt = logStmt;
+        this.project = logStmt.getProject();
         this.exceptionTypes = deriveExceptionTypes(logStmt);
         this.exceptionMethods = resolveExceptionMethods(logStmt);
-        this.project = logStmt.getProject();
         this.logLevel = extractLogLevel(logStmt);
         this.isStackTraceLogged = deriveIsStackTraceLogged(logStmt);
 
@@ -44,12 +44,12 @@ public class ExceptionLoggingMetrics {
                     ", Exception category: " + getExceptionCategory(t) +
                     ", Exception source: " + getExceptionSource(t));
         }
-        logger.debug("Presentable exception types: " + getPresentableExceptionTypes());
+        logger.debug("Presentable exception types: " + getPresentableExceptionType());
         logger.debug("Presentable exception category: " + getPresentableExceptionCategory());
         logger.debug("Presentable exception source: " + getPresentableExceptionSource());
         */
         /*
-        logger.debug("Exception methods: " + getPresentableExceptionMethods());
+        logger.debug("Exception methods: " + getPresentableExceptionMethod());
         logger.debug("Method source: " + getPresentableExceptionMethodSource());
         */
     }
@@ -66,6 +66,8 @@ public class ExceptionLoggingMetrics {
         //explanatory variables
         metricsHeader.add("containingPackage");
         metricsHeader.add("exceptionType"); // exceptions caught by the containing catch block
+        metricsHeader.add("parentExType");
+        metricsHeader.add("grandParentExType");
         metricsHeader.add("exceptionCategory"); // Normal exception, RuntimeException, or Error
         metricsHeader.add("exceptionSource"); // project, library, or JDK
         metricsHeader.add("exceptionNum"); // number of exceptions caught by the containing catch block
@@ -105,11 +107,13 @@ public class ExceptionLoggingMetrics {
 
         //explanatory variables
         metrics.add(getContainingPackageName(this.logStmt));
-        metrics.add(getPresentableExceptionTypes());
+        metrics.add(getPresentableExceptionType());
+        metrics.add(getParentExceptionType());
+        metrics.add(getGrandParentType());
         metrics.add(getPresentableExceptionCategory());
         metrics.add(getPresentableExceptionSource());
         metrics.add(String.valueOf(getExceptionTypes().size()));
-        metrics.add(getPresentableExceptionMethods());
+        metrics.add(getPresentableExceptionMethod());
         metrics.add(getExceptionMethodPackageName());
         metrics.add(getPresentableExceptionMethodSource());
         metrics.add(String.valueOf(getExceptionMethods().size()));
@@ -146,51 +150,81 @@ public class ExceptionLoggingMetrics {
         return javaFile.getPackageName();
     }
 
-    public String getPresentableExceptionTypes() {
+    public String getPresentableExceptionType() {
         if (this.exceptionTypes.size() == 0) {
             return "UnknownException";
-        } else if (this.exceptionTypes.size() == 1) {
+        } else {// if (this.exceptionTypes.size() == 1) {
+            // only consider the first exception
             return this.exceptionTypes.get(0).getPresentableText();
-        } else {
+        } /*else {
             return "MultiExceptions";
-/*            return exceptionTypes.
-                    stream().
-                    map(t -> t.getCanonicalText()).
-                    reduce("", (a, b) -> a + " " + b);*/
+        }*/
+    }
+
+    public String getParentExceptionType() {
+        if (this.exceptionTypes.size() == 0) {
+            return "UnknownException";
+        } else {
+            PsiType[] parentTypes = this.exceptionTypes.get(0).getSuperTypes();
+            if (parentTypes.length == 0) {
+                return "NoParentException";
+            } else {
+                return parentTypes[0].getPresentableText();
+            }
         }
     }
 
-    public String getPresentableExceptionMethods() {
+    public String getGrandParentType() {
+        if (this.exceptionTypes.size() == 0) {
+            return "UnknownException";
+        } else {
+            PsiType[] parentTypes = this.exceptionTypes.get(0).getSuperTypes();
+            if (parentTypes.length == 0) {
+                return "NoParentException";
+            } else {
+                PsiType[] grandParentTypes = parentTypes[0].getSuperTypes();
+                if (grandParentTypes.length == 0) {
+                    return "NoGrandParentException";
+                } else {
+                    return grandParentTypes[0].getPresentableText();
+                }
+            }
+        }
+    }
+
+    public String getPresentableExceptionMethod() {
         if (this.exceptionMethods.size() == 0) {
             return "UnknownMethod";
-        } else if (this.exceptionMethods.size() == 1) {
+        } else {//if (this.exceptionMethods.size() == 1) {
+            // only consider the first method
             PsiMethod method = this.exceptionMethods.get(0);
             PsiClass containingClass = method.getContainingClass();
             return containingClass.getName() + "." + method.getName();
-        } else {
+        } /*else {
             return "MultiMethods";
-/*            return exceptionMethods.
-                    stream().
-                    map(m -> m.getName()).
-                    reduce("", (a,b) -> a + " " +b );*/
-        }
+        }*/
     }
 
     public String getExceptionMethodPackageName() {
         if (this.exceptionMethods.size() == 0) {
             return "UnknownMethod";
-        } else if (this.exceptionMethods.size() == 1) {
+        } else {//if (this.exceptionMethods.size() == 1) {
+            // only consider the first method
             PsiMethod method = this.exceptionMethods.get(0);
             return getContainingPackageName(method);
-        } else {
+        } /*else {
             return "MultiMethods";
-        }
+        }*/
     }
 
     public String getPresentableExceptionSource() {
-        if (this.exceptionTypes.size() == 1) {
+        if (this.exceptionTypes.size() == 0) {
+            return "UnknownException";
+        } else { //if (this.exceptionTypes.size() == 1) {s
+            // only consider the first exception
             return getExceptionSource(this.exceptionTypes.get(0)).name();
         }
+        /*
         // if all sources are the same, return the source; otherwise return "MIXED"
         String source = null;
         for (PsiType e: this.exceptionTypes) {
@@ -201,12 +235,17 @@ public class ExceptionLoggingMetrics {
             }
         }
         return source;
+        */
     }
 
     public String getPresentableExceptionCategory() {
-        if (this.exceptionTypes.size() == 1) {
+        if (this.exceptionTypes.size() == 0) {
+            return "UnknownException";
+        } else { //if (this.exceptionTypes.size() == 1) {
+            // only consider the first exception
             return getExceptionCategory(this.exceptionTypes.get(0)).name();
         }
+        /*
         // if all categories are the same, return the category; otherwise return "MIXED"
         String category = null;
         for (PsiType e : this.exceptionTypes) {
@@ -217,16 +256,18 @@ public class ExceptionLoggingMetrics {
             }
         }
         return category;
+        */
     }
 
     public String getPresentableExceptionMethodSource() {
         if (this.exceptionMethods.size() == 0) {
             return "UnknownMethod";
-        }
-
-        if (this.exceptionMethods.size() == 1) {
+        } else { //if (this.exceptionMethods.size() == 1) {
+            // only consider the first method
             return getMethodSource(this.exceptionMethods.get(0)).name();
         }
+
+        /*
         // if all sources are the same, return the source; otherwise return "MIXED"
         String source = null;
         for (PsiMethod m : this.exceptionMethods) {
@@ -237,6 +278,7 @@ public class ExceptionLoggingMetrics {
             }
         }
         return source;
+        */
     }
 
     public boolean isCatchBlockWithInLoop() {
@@ -602,7 +644,6 @@ public class ExceptionLoggingMetrics {
      * Get the methods in the try block that "throws" the logged exception types (or their sub types)
      * @return
      */
-    //TODO: consider throw statements; consider previous catch clauses
     private List<PsiMethod> resolveExceptionMethods(PsiMethodCallExpression logStmt) {
         List<PsiMethod> exMethods = new ArrayList<>();
 
@@ -652,7 +693,18 @@ public class ExceptionLoggingMetrics {
         Collection<PsiThrowStatement> throwStatements = PsiTreeUtil.findChildrenOfType(tryBlock, PsiThrowStatement.class);
         for (PsiThrowStatement throwS : throwStatements) {
             PsiNewExpression newExpr = PsiTreeUtil.findChildOfType(throwS, PsiNewExpression.class);
+            if (newExpr == null) {
+                //logger.debug("Cannot get new expression of throw statement: " + throwS.getText());
+                continue;
+            }
             PsiClass exClass = (PsiClass) newExpr.getClassReference().resolve();
+            if (exClass == null) {
+                //logger.debug("Fail to resolve exception class for new expression: " + newExpr.getText());
+                continue;
+            }
+            //logger.info("Resolved exception class for new expression: " + newExpr.getText() +
+            //        ", to exception class: " + exClass.getQualifiedName());
+
             //logger.debug("New expression: " + newExpr.getText() + ", Exception Class name: " + exClass.getQualifiedName());
             PsiType thrownExType = getPsiTypeByQualifiedName(exClass.getQualifiedName());
             if (thrownExType == null) continue;

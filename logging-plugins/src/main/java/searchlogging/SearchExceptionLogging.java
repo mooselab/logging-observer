@@ -70,9 +70,9 @@ public class SearchExceptionLogging extends AnAction {
 
             ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
             /*
-            String typesStr = metrics.getPresentableExceptionTypes();
+            String typesStr = metrics.getPresentableExceptionType();
             loggingStatementsStr.append("Exception type: ").append(typesStr).append("\n");
-            String methodsStr = metrics.getPresentableExceptionMethods();
+            String methodsStr = metrics.getPresentableExceptionMethod();
             loggingStatementsStr.append("Exception methods: ").append(methodsStr).append("\n");
 
             loggingStatementsStr.append(log.getText()).append(("\n"));
