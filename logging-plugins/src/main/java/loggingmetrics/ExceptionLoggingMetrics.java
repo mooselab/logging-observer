@@ -68,6 +68,7 @@ public class ExceptionLoggingMetrics {
         metricsHeader.add("exceptionType"); // exceptions caught by the containing catch block
         metricsHeader.add("parentExType");
         metricsHeader.add("grandParentExType");
+        metricsHeader.add("exceptionPackage");
         metricsHeader.add("exceptionCategory"); // Normal exception, RuntimeException, or Error
         metricsHeader.add("exceptionSource"); // project, library, or JDK
         metricsHeader.add("exceptionNum"); // number of exceptions caught by the containing catch block
@@ -110,6 +111,7 @@ public class ExceptionLoggingMetrics {
         metrics.add(getPresentableExceptionType());
         metrics.add(getParentExceptionType());
         metrics.add(getGrandParentType());
+        metrics.add(getExceptionPackageName());
         metrics.add(getPresentableExceptionCategory());
         metrics.add(getPresentableExceptionSource());
         metrics.add(String.valueOf(getExceptionTypes().size()));
@@ -146,8 +148,13 @@ public class ExceptionLoggingMetrics {
     public boolean getIsStackTraceLogged() { return this.isStackTraceLogged; }
 
     public String getContainingPackageName(PsiElement element) {
-        PsiJavaFile javaFile = (PsiJavaFile) element.getContainingFile();
-        return javaFile.getPackageName();
+        //PsiJavaFile javaFile = (PsiJavaFile) element.getContainingFile();
+        PsiFile file = element.getContainingFile();
+        if (file instanceof PsiClassOwner) {
+            return ((PsiClassOwner)file).getPackageName();
+        } else {
+            return "UnknownPackageName";
+        }
     }
 
     public String getPresentableExceptionType() {
@@ -203,6 +210,19 @@ public class ExceptionLoggingMetrics {
         } /*else {
             return "MultiMethods";
         }*/
+    }
+
+    private String getExceptionPackageName() {
+        if (this.exceptionTypes.size() == 0) {
+            return "UnknownException";
+        } else {
+            PsiClass exClass = ((PsiClassType)this.exceptionTypes.get(0)).resolve();
+            if (exClass == null) {
+                return "UnknownExceptionClass";
+            } else {
+                return getContainingPackageName(exClass);
+            }
+        }
     }
 
     public String getExceptionMethodPackageName() {
@@ -876,6 +896,18 @@ public class ExceptionLoggingMetrics {
             //if (match) break; // only choose the first matching method.
         }
 
+        if (exMethods.size() > 0) {
+            return exMethods;
+        }
+
+        // if caught exceptions are still not resolved, return the first method call
+        for (PsiCallExpression callExpr : callExpressions) {
+            PsiMethod method = callExpr.resolveMethod();
+            if (method != null) {
+                exMethods.add(method);
+                break;
+            }
+        }
 
         /*
 
