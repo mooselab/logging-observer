@@ -89,6 +89,8 @@ public class ExceptionLoggingMetrics {
         metricsHeader.add("LOCBeforeLogging"); // lines of code in the containing catch block before the logging statement
         metricsHeader.add("LOCAfterLogging"); // lines of code the containing block after the logging statement
         metricsHeader.add("numMethodCallsInTryBlock"); // number of method calls in the containing try block
+        metricsHeader.add("LOCInTryBlock"); // LOC in the try block
+        metricsHeader.add("LOCInFile"); // LOC in the file
 
 
         return String.join(",", metricsHeader);
@@ -134,8 +136,8 @@ public class ExceptionLoggingMetrics {
         metrics.add(String.valueOf(LOCs[0]));
         metrics.add(String.valueOf(LOCs[1]));
         metrics.add(String.valueOf(getNumMethodCallsInTryBlock()));
-
-
+        metrics.add(String.valueOf(getTryBlockLOC()));
+        metrics.add(String.valueOf(getFileLOC()));
 
         return String.join(",",metrics);
     }
@@ -461,6 +463,37 @@ public class ExceptionLoggingMetrics {
         LOCs[1] = catch_end_line - log_end_line - 1; // loc after logging statement
 
         return LOCs;
+    }
+
+    public int getTryBlockLOC() {
+        // containing catch block
+        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(this.logStmt, PsiCatchSection.class);
+        if (catchSection == null) {
+            return 0;
+        }
+
+        // try statement
+        PsiTryStatement tryStatement = PsiTreeUtil.getParentOfType(catchSection, PsiTryStatement.class);
+        if (tryStatement == null) {
+            return 0;
+        }
+
+        // try block
+        PsiCodeBlock tryBlock = PsiTreeUtil.getChildOfType(tryStatement, PsiCodeBlock.class);
+
+        // position of the try block
+        int try_start_offset = tryBlock.getTextOffset();
+        int try_end_offset = try_start_offset + tryBlock.getTextLength() - 1;
+        PsiFile file = tryBlock.getContainingFile();
+        int try_start_line = StringUtil.offsetToLineNumber(file.getText(), try_start_offset) + 1;
+        int try_end_line = StringUtil.offsetToLineNumber(file.getText(), try_end_offset) + 1;
+
+        return try_end_line - try_start_line - 1;
+    }
+
+    public int getFileLOC() {
+        PsiFile file = this.logStmt.getContainingFile();
+        return StringUtil.getLineBreakCount(file.getText());
     }
 
     public int getNumMethodCallsInTryBlock() {
