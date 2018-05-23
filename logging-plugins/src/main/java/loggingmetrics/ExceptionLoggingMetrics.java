@@ -91,6 +91,8 @@ public class ExceptionLoggingMetrics {
         metricsHeader.add("numMethodCallsInTryBlock"); // number of method calls in the containing try block
         metricsHeader.add("LOCInTryBlock"); // LOC in the try block
         metricsHeader.add("LOCInFile"); // LOC in the file
+        metricsHeader.add("LOCInMethod"); // LOC in the containing method
+        metricsHeader.add("numMethodCallsInMethod"); // number of method calls n the containing method
 
 
         return String.join(",", metricsHeader);
@@ -100,9 +102,8 @@ public class ExceptionLoggingMetrics {
         List<String> metrics = new ArrayList<>();
 
         // log identification/index
-        PsiFile psiFile = this.logStmt.getContainingFile();
-        int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), this.logStmt.getTextOffset()) + 1;
-        metrics.add(psiFile.getVirtualFile().getName() + ":" + lineNumber);
+        String fileLocation = getLocationInFile(this.logStmt);
+        metrics.add(fileLocation);
 
         // response variables
         metrics.add(getLogLevel());
@@ -138,8 +139,17 @@ public class ExceptionLoggingMetrics {
         metrics.add(String.valueOf(getNumMethodCallsInTryBlock()));
         metrics.add(String.valueOf(getTryBlockLOC()));
         metrics.add(String.valueOf(getFileLOC()));
+        metrics.add(String.valueOf(getMethodLOC()));
+        metrics.add(String.valueOf(getNumMethodCallsInMethod()));
 
         return String.join(",",metrics);
+    }
+
+    @NotNull
+    public String getLocationInFile(PsiElement element) {
+        PsiFile psiFile = element.getContainingFile();
+        int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), element.getTextOffset()) + 1;
+        return psiFile.getVirtualFile().getName() + ":" + lineNumber;
     }
 
     public List<PsiType> getExceptionTypes() {return this.exceptionTypes;}
@@ -491,6 +501,42 @@ public class ExceptionLoggingMetrics {
         return try_end_line - try_start_line - 1;
     }
 
+    public int getMethodLOC() {
+        // containing method
+        PsiMethod method = PsiTreeUtil.getParentOfType(this.logStmt, PsiMethod.class);
+
+        if (method != null) {
+
+            // position of the method
+            int method_start_offset = method.getTextOffset();
+            int method_end_offset = method_start_offset + method.getTextLength() - 1;
+            PsiFile file = method.getContainingFile();
+            int method_start_line = StringUtil.offsetToLineNumber(file.getText(), method_start_offset) + 1;
+            int method_end_line = StringUtil.offsetToLineNumber(file.getText(), method_end_offset) + 1;
+
+            return method_end_line - method_start_line - 1;
+        } else {
+
+            PsiClassInitializer classInitializer = PsiTreeUtil.getParentOfType(this.logStmt,
+                    PsiClassInitializer.class);
+
+            if (classInitializer == null) {
+                logger.warn("Could not find containing method or class initializer of logging statement at: " +
+                        getLocationInFile(this.logStmt));
+                return 0;
+            }
+
+            // position of the class initializer
+            int initializer_start_offset = classInitializer.getTextOffset();
+            int initializer_end_offset = initializer_start_offset + classInitializer.getTextLength() - 1;
+            PsiFile file = classInitializer.getContainingFile();
+            int initializer_start_line = StringUtil.offsetToLineNumber(file.getText(), initializer_start_offset) + 1;
+            int initializer_end_line = StringUtil.offsetToLineNumber(file.getText(), initializer_end_offset) + 1;
+
+            return initializer_end_line - initializer_start_line - 1;
+        }
+    }
+
     public int getFileLOC() {
         PsiFile file = this.logStmt.getContainingFile();
         return StringUtil.getLineBreakCount(file.getText());
@@ -514,6 +560,14 @@ public class ExceptionLoggingMetrics {
 
         // number of the method calls in the try block
         Collection<PsiMethodCallExpression> methodCalls = PsiTreeUtil.findChildrenOfType(tryBlock, PsiMethodCallExpression.class);
+
+        return methodCalls.size();
+    }
+
+    public int getNumMethodCallsInMethod() {
+        // containing method
+        PsiMethod method = PsiTreeUtil.getParentOfType(this.logStmt, PsiMethod.class);
+        Collection<PsiMethodCallExpression> methodCalls = PsiTreeUtil.findChildrenOfType(method, PsiMethodCallExpression.class);
 
         return methodCalls.size();
     }
