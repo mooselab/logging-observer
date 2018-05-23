@@ -511,8 +511,19 @@ public class ExceptionLoggingMetrics {
             int method_start_offset = method.getTextOffset();
             int method_end_offset = method_start_offset + method.getTextLength() - 1;
             PsiFile file = method.getContainingFile();
+            //if (method_end_offset > file.getText().length()) method_end_offset = file.getText().length();
             int method_start_line = StringUtil.offsetToLineNumber(file.getText(), method_start_offset) + 1;
             int method_end_line = StringUtil.offsetToLineNumber(file.getText(), method_end_offset) + 1;
+
+            if (method_end_line - method_start_line -1 < 0) {
+                method_end_line = getFileLOC();
+                logger.warn("LOC is negative: " + getLocationInFile(this.logStmt) +
+                        ", method_start_offset: " + method_start_offset +
+                ", method_end_offset: " + method_end_offset +
+                ", method_start_line: " + method_start_line +
+                ", method_end_line: " + method_end_line +
+                ", text length: " + file.getText().length());
+            }
 
             return method_end_line - method_start_line - 1;
         } else {
@@ -530,8 +541,13 @@ public class ExceptionLoggingMetrics {
             int initializer_start_offset = classInitializer.getTextOffset();
             int initializer_end_offset = initializer_start_offset + classInitializer.getTextLength() - 1;
             PsiFile file = classInitializer.getContainingFile();
+            //if (initializer_end_offset > file.getText().length()) initializer_end_offset = file.getText().length();
             int initializer_start_line = StringUtil.offsetToLineNumber(file.getText(), initializer_start_offset) + 1;
             int initializer_end_line = StringUtil.offsetToLineNumber(file.getText(), initializer_end_offset) + 1;
+
+            if (initializer_end_line - initializer_start_line - 1 < 0) {
+                initializer_end_line = getFileLOC();
+            }
 
             return initializer_end_line - initializer_start_line - 1;
         }
