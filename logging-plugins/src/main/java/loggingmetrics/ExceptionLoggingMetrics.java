@@ -5,9 +5,11 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.openapi.project.Project;
 
+import com.intellij.util.Query;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +95,8 @@ public class ExceptionLoggingMetrics {
         metricsHeader.add("LOCInFile"); // LOC in the file
         metricsHeader.add("LOCInMethod"); // LOC in the containing method
         metricsHeader.add("numMethodCallsInMethod"); // number of method calls n the containing method
+        metricsHeader.add("methodUsages"); // number of usages of the containing method
+        //metricsHeader.add("fanIn"); // number of usages of the containing method and its super methods
 
 
         return String.join(",", metricsHeader);
@@ -141,6 +145,8 @@ public class ExceptionLoggingMetrics {
         metrics.add(String.valueOf(getFileLOC()));
         metrics.add(String.valueOf(getMethodLOC()));
         metrics.add(String.valueOf(getNumMethodCallsInMethod()));
+        metrics.add(String.valueOf(getUsageNumOfContainingMethod()));
+        //metrics.add(String.valueOf(getUsageNumOfContainingMethodAndSuperMethods())); // commented because it takes too much cpu/memory
 
         return String.join(",",metrics);
     }
@@ -517,12 +523,14 @@ public class ExceptionLoggingMetrics {
 
             if (method_end_line - method_start_line -1 < 0) {
                 method_end_line = getFileLOC();
+                /*
                 logger.warn("LOC is negative: " + getLocationInFile(this.logStmt) +
                         ", method_start_offset: " + method_start_offset +
                 ", method_end_offset: " + method_end_offset +
                 ", method_start_line: " + method_start_line +
                 ", method_end_line: " + method_end_line +
                 ", text length: " + file.getText().length());
+                */
             }
 
             return method_end_line - method_start_line - 1;
@@ -583,9 +591,40 @@ public class ExceptionLoggingMetrics {
     public int getNumMethodCallsInMethod() {
         // containing method
         PsiMethod method = PsiTreeUtil.getParentOfType(this.logStmt, PsiMethod.class);
+        if (method == null) {
+            return 0;
+        }
         Collection<PsiMethodCallExpression> methodCalls = PsiTreeUtil.findChildrenOfType(method, PsiMethodCallExpression.class);
 
         return methodCalls.size();
+    }
+
+    public int getUsageNumOfContainingMethod() {
+        // containing method
+        PsiMethod method = PsiTreeUtil.getParentOfType(this.logStmt, PsiMethod.class);
+        if (method == null) {
+            return 0;
+        }
+
+        Query<PsiReference> references = ReferencesSearch.search(method);
+        return references.findAll().size();
+    }
+
+    public int getUsageNumOfContainingMethodAndSuperMethods() {
+        // containing method
+        PsiMethod method = PsiTreeUtil.getParentOfType(this.logStmt, PsiMethod.class);
+        if (method == null) {
+            return 0;
+        }
+        Query<PsiReference> methodRefs = ReferencesSearch.search(method);
+
+        PsiMethod[] superMethods = method.findSuperMethods();
+        List<PsiReference> superRefs = new ArrayList<>();
+        for (PsiMethod superMethod : superMethods) {
+            superRefs.addAll(ReferencesSearch.search(superMethod).findAll());
+        }
+
+        return methodRefs.findAll().size() + superRefs.size();
     }
 
     public int getNumReturnInCatchBlock() {
