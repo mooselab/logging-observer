@@ -24,6 +24,8 @@ public class ExceptionLoggingMetrics {
 
     private PsiMethodCallExpression logStmt;
     String logLevel;
+    String logText;
+    String logBody;
     private boolean isStackTraceLogged;
     private List<PsiType> exceptionTypes;
     private List<PsiMethod> exceptionMethods;
@@ -35,6 +37,8 @@ public class ExceptionLoggingMetrics {
         this.exceptionTypes = deriveExceptionTypes(logStmt);
         this.exceptionMethods = resolveExceptionMethods(logStmt);
         this.logLevel = extractLogLevel(logStmt);
+        this.logText = extractLogText(logStmt);
+        this.logBody = extractLogBody(logStmt);
         this.isStackTraceLogged = deriveIsStackTraceLogged(logStmt);
 
         // debugging
@@ -151,6 +155,27 @@ public class ExceptionLoggingMetrics {
         return String.join(",",metrics);
     }
 
+
+    public static String getLogComponentsHeader() {
+        List<String> componentsHeader = new ArrayList<>();
+
+        componentsHeader.add("logBody");
+        componentsHeader.add("logLevel");
+        componentsHeader.add("logText");
+
+        return String.join(",", componentsHeader);
+    }
+
+    public String getLogComponents() {
+        List<String> logComponents = new ArrayList<>();
+
+        logComponents.add(getLogBody());
+        logComponents.add(getLogLevel());
+        logComponents.add(getLogText());
+
+        return String.join(",", logComponents);
+    }
+
     @NotNull
     public String getLocationInFile(PsiElement element) {
         PsiFile psiFile = element.getContainingFile();
@@ -162,6 +187,8 @@ public class ExceptionLoggingMetrics {
     public List<PsiMethod> getExceptionMethods() {return this.exceptionMethods;}
 
     public String getLogLevel() { return this.logLevel; }
+    public String getLogText() { return this.logText; }
+    public String getLogBody() { return this.logBody; }
 
     public boolean getIsStackTraceLogged() { return this.isStackTraceLogged; }
 
@@ -1289,6 +1316,23 @@ public class ExceptionLoggingMetrics {
         PsiReferenceExpression methodCall = logStmt.getMethodExpression();
         String logMethodName = PsiTreeUtil.getChildOfType(methodCall, PsiIdentifier.class).getText();
         return logMethodName;
+    }
+
+    private String extractLogText(PsiMethodCallExpression logStmt) {
+        PsiExpressionList expressionList = logStmt.getArgumentList();
+        Collection<PsiLiteralExpression> literalExpressions =
+                PsiTreeUtil.findChildrenOfType(expressionList, PsiLiteralExpression.class);
+        if (literalExpressions.size() >= 1) {
+            return literalExpressions.stream()
+                .map( l -> l.toString())
+                .collect(Collectors.joining("..."));
+        } else {
+            return "";
+        }
+    }
+
+    private String extractLogBody(PsiMethodCallExpression logStmt) {
+        return logStmt.getText();
     }
 
     private boolean deriveIsStackTraceLogged(PsiMethodCallExpression logStmt) {

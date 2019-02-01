@@ -16,6 +16,7 @@ import com.intellij.usageView.UsageInfo;
 import com.intellij.usages.*;
 import com.intellij.util.Query;
 import com.intellij.util.indexing.FileBasedIndex;
+import loggingmetrics.LoggingMetrics;
 import org.jetbrains.annotations.NotNull;
 
 // logger for development environment, configured in this plugin project's resources/logback.xml file
@@ -71,11 +72,19 @@ public class SearchLoggingUsages extends AnAction {
         */
 
         StringBuilder loggingStatementsStr = new StringBuilder();
+        loggingStatementsStr.append(LoggingMetrics.getLogComponentsHeader()).append("\n");
         for (PsiMethodCallExpression log : loggingStatements) {
             PsiFile psiFile = log.getContainingFile();
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
-            loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
-            loggingStatementsStr.append(log.getText()).append(("\n"));
+            //loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
+            //loggingStatementsStr.append(log.getText()).append(("\n"));
+
+            // get the location of the logging statement
+            //loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append(":");
+
+            // get the components of the logging statement
+            LoggingMetrics metrics = new LoggingMetrics(log);
+            loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
 
             /*
             loggingStatementsStr.append(log.getMethodExpression().getText()).append("\n");
@@ -87,7 +96,7 @@ public class SearchLoggingUsages extends AnAction {
             */
         }
         //logger.debug("\"Logger\" occurrences: \n{}", loggers);
-        logger.debug("Logging statements: \n" + loggingStatementsStr);
+        logger.info("Logging metrics for project " + projectName + ":\n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, loggingStatements);
