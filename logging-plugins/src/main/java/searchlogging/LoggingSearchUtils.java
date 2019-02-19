@@ -1,6 +1,11 @@
 package searchlogging;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.roots.ui.configuration.JavaModuleSourceRootEditHandler;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiSearchHelper;
@@ -11,6 +16,7 @@ import com.intellij.usages.*;
 import com.intellij.util.Query;
 import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +85,28 @@ public class LoggingSearchUtils {
                 UsageSearchContext.IN_CODE, true
         );
         return loggingStatements;
+    }
+
+    public static List<PsiCatchSection> findCatchSectionsInProject(Project project) {
+        List<PsiCatchSection> catchSections = new ArrayList<>();
+        List<PsiFile> psiFiles = new ArrayList<>();
+
+        ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        projectFileIndex.iterateContent(new ContentIterator() {
+            @Override
+            public boolean processFile(VirtualFile fileOrDir) {
+                if (!fileOrDir.isDirectory() && projectFileIndex.isUnderSourceRootOfType(fileOrDir,
+                        JavaModuleSourceRootTypes.SOURCES)) {
+                    PsiFile psiFile = PsiManager.getInstance(project).findFile(fileOrDir);
+                    if (psiFile instanceof PsiJavaFile) {
+                        psiFiles.add(psiFile);
+                    }
+                }
+                return true;
+            }
+        });
+
+        return catchSections;
     }
 
     /**
