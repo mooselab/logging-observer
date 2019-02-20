@@ -1,4 +1,4 @@
-package loggingmetrics;
+package exceptionloggingmetrics;
 
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.util.text.StringUtil;

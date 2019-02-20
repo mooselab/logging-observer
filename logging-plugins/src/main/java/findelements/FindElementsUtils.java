@@ -98,8 +98,45 @@ public class FindElementsUtils {
         return catchSections;
     }
 
+    public static List<PsiMethodCallExpression> findLoggingStatementsInFiles(Project project) {
+        List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
+
+        // Pattern for matching logging statements
+        Pattern pLog = Pattern.compile(".*log.*\\.(trace|debug|info|warn|error|fatal)", Pattern.CASE_INSENSITIVE);
+
+        ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        projectFileIndex.iterateContent(new ContentIterator() {
+            @Override
+            public boolean processFile(VirtualFile fileOrDir) {
+                if (!fileOrDir.isDirectory() && projectFileIndex.isUnderSourceRootOfType(fileOrDir,
+                        JavaModuleSourceRootTypes.SOURCES)) {
+                    PsiFile psiFile = PsiManager.getInstance(project).findFile(fileOrDir);
+                    if (!(psiFile instanceof PsiJavaFile)) {
+                        return true; // skip non-Java files
+                    }
+                    String fileName = psiFile.getName();
+                    if (fileName.matches(".*Test\\.java")) {
+                        return true; // skip test files
+                    }
+
+                    PsiTreeUtil.findChildrenOfType(psiFile, PsiMethodCallExpression.class).forEach(m -> {
+                        if (pLog.matcher(m.getMethodExpression().getText()).matches()) {
+                            loggingStatements.add(m);
+                        }
+                    });
+
+                }
+                return true;
+            }
+        });
+
+        //logger.info(files.toString());
+
+        return loggingStatements;
+    }
+
     public static List<PsiMethodCallExpression> findLoggingStatementsInCatchSections(Project project) {
-        List<PsiCatchSection> catchSections = new ArrayList<>();
+        //List<PsiCatchSection> catchSections = new ArrayList<>();
         List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
 
         // Pattern for matching logging statements
@@ -125,7 +162,7 @@ public class FindElementsUtils {
                         return true;
                     }
 
-                    catchSections.addAll(catchSectionsInFile);
+                    //catchSections.addAll(catchSectionsInFile);
 
                     for (PsiCatchSection catchSection : catchSectionsInFile) {
                         //Collection<PsiMethodCallExpression> methodCallsInCatch =

@@ -1,4 +1,4 @@
-package loggingmetrics;
+package exceptionloggingmetrics;
 
 public enum ReferenceSource {
     FROMPROJECT,

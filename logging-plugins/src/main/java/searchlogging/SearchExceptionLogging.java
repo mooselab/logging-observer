@@ -3,12 +3,11 @@ package searchlogging;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
-import loggingmetrics.ExceptionLoggingMetrics;
+import exceptionloggingmetrics.ExceptionLoggingMetrics;
 
 import java.util.ArrayList;
 import java.util.List;

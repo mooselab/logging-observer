@@ -42,7 +42,8 @@
             <add-to-group group-id="MainMenu" anchor="last"/>
             <action id="LogPlugin.FindJavaSourceFiles" class="findelements.FindJavaSourceFiles" text="Find Java Sources" description="Find all Java source files"/>
             <action id="LogPlugin.FindCatchSections" class="findelements.FindJavaCatchSections" text="Find Catch Sections" description="Find all Java catch sections"/>
-            <action id="LogPlugin.FindLoggingInCatchSections" class="findelements.FindLoggingStatementsInCatchSections" text="Find Logging in Catch" description="Find logging statements catch sections"/>
+            <action id="LogPlugin.FindLogging" class="findelements.FindLoggingStatements" text="Find All Logging" description="Find all the logging statements"/>
+            <action id="LogPlugin.FindLoggingInCatchSections" class="findelements.FindLoggingStatementsInCatchSections" text="Find Logging in Catch" description="Find logging statements in catch sections"/>
         </group>
 
     </actions>
