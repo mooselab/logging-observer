@@ -31,11 +31,19 @@
 
     <actions>
         <!-- Add your actions here -->
-        <group id="LoggingPlugin.MainMenu" text="Logging" description="Logging options">
+        <group id="LoggingPlugin.SearchLogging" text="SearchLogging" description="Logging search options">
             <add-to-group group-id="MainMenu" anchor="last"/>
             <action id="LogPlugin.SearchLogging" class="searchlogging.SearchLoggingUsages" text="Search All Logging Statements" description="Search all logging statements"/>
             <action id="LogPlugin.SampleLogging" class="searchlogging.SampleLoggingUsages" text="Sample 100 Logging Statements" description="Sample 100 logging statements"/>
             <action id="LogPlugin.SearchExceptionLogging" class="searchlogging.SearchExceptionLogging" text="Search Exception Logging" description="Search all exception logging statements"/>
         </group>
+
+        <group id="LoggingPlugin.FindElements" text="FindElements" description="Find elements by types">
+            <add-to-group group-id="MainMenu" anchor="last"/>
+            <action id="LogPlugin.FindJavaSourceFiles" class="findelements.FindJavaSourceFiles" text="Find Java Sources" description="Find all Java source files"/>
+            <action id="LogPlugin.FindCatchSections" class="findelements.FindJavaCatchSections" text="Find Catch Sections" description="Find all Java catch sections"/>
+            <action id="LogPlugin.FindLoggingInCatchSections" class="findelements.FindLoggingStatementsInCatchSections" text="Find Logging in Catch" description="Find logging statements catch sections"/>
+        </group>
+
     </actions>
 </idea-plugin>

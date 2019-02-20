@@ -11,6 +11,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.usages.*;
 import com.intellij.util.Query;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class LoggingSearchUtils {
@@ -87,27 +89,7 @@ public class LoggingSearchUtils {
         return loggingStatements;
     }
 
-    public static List<PsiCatchSection> findCatchSectionsInProject(Project project) {
-        List<PsiCatchSection> catchSections = new ArrayList<>();
-        List<PsiFile> psiFiles = new ArrayList<>();
 
-        ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
-        projectFileIndex.iterateContent(new ContentIterator() {
-            @Override
-            public boolean processFile(VirtualFile fileOrDir) {
-                if (!fileOrDir.isDirectory() && projectFileIndex.isUnderSourceRootOfType(fileOrDir,
-                        JavaModuleSourceRootTypes.SOURCES)) {
-                    PsiFile psiFile = PsiManager.getInstance(project).findFile(fileOrDir);
-                    if (psiFile instanceof PsiJavaFile) {
-                        psiFiles.add(psiFile);
-                    }
-                }
-                return true;
-            }
-        });
-
-        return catchSections;
-    }
 
     /**
      * Show a list of method calls in the find tool window
