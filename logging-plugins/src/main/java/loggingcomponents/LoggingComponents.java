@@ -1,15 +1,8 @@
-package loggingmetrics;
+package loggingcomponents;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.*;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Query;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LoggingMetrics {
-    private static final Logger logger = LoggerFactory.getLogger(LoggingMetrics.class);
+public class LoggingComponents {
+    private static final Logger logger = LoggerFactory.getLogger(LoggingComponents.class);
 
     private PsiMethodCallExpression logStmt;
     String logLevel;
@@ -29,7 +22,7 @@ public class LoggingMetrics {
 
     private Project project;
 
-    public LoggingMetrics(PsiMethodCallExpression logStmt) {
+    public LoggingComponents(PsiMethodCallExpression logStmt) {
         this.logStmt = logStmt;
         this.project = logStmt.getProject();
         this.logLevel = extractLogLevel(logStmt);

@@ -1,22 +1,11 @@
 package searchlogging;
 
-import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiSearchHelper;
-import com.intellij.psi.search.UsageSearchContext;
-import com.intellij.psi.search.searches.ReferencesSearch;
-import com.intellij.usageView.UsageInfo;
-import com.intellij.usages.*;
-import com.intellij.util.Query;
-import com.intellij.util.indexing.FileBasedIndex;
-import loggingmetrics.LoggingMetrics;
+import loggingcomponents.LoggingComponents;
 import org.jetbrains.annotations.NotNull;
 
 // logger for development environment, configured in this plugin project's resources/logback.xml file
@@ -25,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 // logger for integrated plugin environment, configured in intellij's bin/log.xml file
 import com.intellij.openapi.diagnostic.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class SearchLoggingUsages extends AnAction {
     // slf4j logger for development environment, configured in this plugin project's resources/logback.xml file
@@ -72,7 +58,7 @@ public class SearchLoggingUsages extends AnAction {
         */
 
         StringBuilder loggingStatementsStr = new StringBuilder();
-        loggingStatementsStr.append(LoggingMetrics.getLogComponentsHeader()).append("\n");
+        loggingStatementsStr.append(LoggingComponents.getLogComponentsHeader()).append("\n");
         for (PsiMethodCallExpression log : loggingStatements) {
             PsiFile psiFile = log.getContainingFile();
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
@@ -83,7 +69,7 @@ public class SearchLoggingUsages extends AnAction {
             //loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append(":");
 
             // get the components of the logging statement
-            LoggingMetrics metrics = new LoggingMetrics(log);
+            LoggingComponents metrics = new LoggingComponents(log);
             loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
 
             /*
