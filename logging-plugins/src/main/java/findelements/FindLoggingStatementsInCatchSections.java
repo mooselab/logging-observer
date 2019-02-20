@@ -10,6 +10,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import exceptionloggingmetrics.ExceptionLoggingMetrics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import searchlogging.LoggingSearchUtils;
@@ -32,7 +33,7 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
 
         // find all logging statements in the project
         List<PsiMethodCallExpression> loggingStatements = findLoggingStatementsInCatchSections(project);
-
+        /*
         StringBuilder loggingStatementsStr = new StringBuilder();
         loggingStatementsStr.append("Logging statements in catch sections in Project " + project.getName() + ":\n");
 
@@ -40,6 +41,17 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
             loggingStatementsStr.append(loggingStatement.getText()).append("\n");
         }
         logger.info(loggingStatementsStr.toString());
+        */
+
+        StringBuilder loggingStatementsStr = new StringBuilder();
+        loggingStatementsStr.append(ExceptionLoggingMetrics.getLoggingMetricsHeader()).append(("\n"));
+        for (PsiMethodCallExpression log : loggingStatements) {
+
+            ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
+
+            loggingStatementsStr.append(metrics.getLoggingMetrics()).append("\n");
+        }
+        logger.info("Exception logging metrics for project " + projectName + ": \n" + loggingStatementsStr);
 
 
         // list the logging statements in the find tool window view

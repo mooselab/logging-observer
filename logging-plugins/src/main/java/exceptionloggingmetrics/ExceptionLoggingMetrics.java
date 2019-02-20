@@ -31,12 +31,14 @@ public class ExceptionLoggingMetrics {
     private List<PsiType> exceptionTypes;
     private List<PsiMethod> exceptionMethods;
     private Project project;
+    private PsiCatchSection catchSection;
 
     public ExceptionLoggingMetrics(PsiMethodCallExpression logStmt) {
         this.logStmt = logStmt;
         this.project = logStmt.getProject();
         this.exceptionTypes = deriveExceptionTypes(logStmt);
         this.exceptionMethods = resolveExceptionMethods(logStmt);
+        this.catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
 
         LoggingComponents logComponents = new LoggingComponents(logStmt);
         this.logLevel = logComponents.getLogLevel();
@@ -66,6 +68,7 @@ public class ExceptionLoggingMetrics {
     public static String getLoggingMetricsHeader() {
         List<String> metricsHeader = new ArrayList<>();
         // log identification/index
+        metricsHeader.add("catchLocation"); // the location of the containing catch block
         metricsHeader.add("logLocation"); // the location of the logging statement - fileName:lineNumber
 
         // response variables
@@ -111,6 +114,9 @@ public class ExceptionLoggingMetrics {
 
     public String getLoggingMetrics() {
         List<String> metrics = new ArrayList<>();
+
+        // location of the containing catch section
+        metrics.add(getLocationInFile(this.catchSection));
 
         // log identification/index
         String fileLocation = getLocationInFile(this.logStmt);
