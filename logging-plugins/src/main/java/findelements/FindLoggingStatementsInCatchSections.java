@@ -41,6 +41,7 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
         }
         logger.info(loggingStatementsStr.toString());
 
+
         // list the logging statements in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,
                 loggingStatements.stream().map(e -> (PsiElement)e).collect(Collectors.toList()));

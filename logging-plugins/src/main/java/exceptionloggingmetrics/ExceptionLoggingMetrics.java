@@ -37,8 +37,8 @@ public class ExceptionLoggingMetrics {
         this.project = logStmt.getProject();
         this.exceptionTypes = deriveExceptionTypes(logStmt);
         this.exceptionMethods = resolveExceptionMethods(logStmt);
-        LoggingComponents logComponents = new LoggingComponents(logStmt);
 
+        LoggingComponents logComponents = new LoggingComponents(logStmt);
         this.logLevel = logComponents.getLogLevel();
         this.logText = logComponents.getLogText();
         this.logBody = logComponents.getLogBody();
@@ -180,7 +180,7 @@ public class ExceptionLoggingMetrics {
     }
 
     @NotNull
-    public String getLocationInFile(PsiElement element) {
+    public static String getLocationInFile(PsiElement element) {
         PsiFile psiFile = element.getContainingFile();
         int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), element.getTextOffset()) + 1;
         return psiFile.getVirtualFile().getName() + ":" + lineNumber;
@@ -807,7 +807,7 @@ public class ExceptionLoggingMetrics {
         return exceptionTypes;
     }
 
-    private List<PsiType> extractExceptionTypesForCatchSection(PsiCatchSection catchSection) {
+    public static List<PsiType> extractExceptionTypesForCatchSection(PsiCatchSection catchSection) {
         // exception parameter declaration
         PsiParameter para = PsiTreeUtil.findChildOfType(catchSection, PsiParameter.class);
 

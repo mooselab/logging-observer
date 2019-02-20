@@ -1,5 +1,6 @@
 package findelements;
 
+import catchmetrics.CatchSectionLoggingInfo;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -32,6 +33,7 @@ public class FindJavaCatchSections extends AnAction {
         // find all logging statements in the project
         List<PsiCatchSection> psiCatchSections = findCatchSectionsInJavaProject(project);
 
+        /*
         StringBuilder catchSectionsStr = new StringBuilder();
         catchSectionsStr.append("Catch sections in Project " + project.getName() + ":\n");
 
@@ -39,6 +41,17 @@ public class FindJavaCatchSections extends AnAction {
             catchSectionsStr.append(catchSection.getCatchType().getCanonicalText()).append("\n");
         }
         logger.info(catchSectionsStr.toString());
+        */
+
+        StringBuilder catchInfoStr = new StringBuilder();
+        catchInfoStr.append(CatchSectionLoggingInfo.getCatchSectionLoggingInfoHeader()).append("\n");
+
+        for(PsiCatchSection catchSection : psiCatchSections) {
+            CatchSectionLoggingInfo catchLogInfo = new CatchSectionLoggingInfo(catchSection);
+            catchInfoStr.append(catchLogInfo.getCatchSectionLoggingInfo()).append("\n");
+        }
+
+        logger.info("Catch section log info for project " + projectName + ": \n" + catchInfoStr);
 
         // list the logging statements in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,
