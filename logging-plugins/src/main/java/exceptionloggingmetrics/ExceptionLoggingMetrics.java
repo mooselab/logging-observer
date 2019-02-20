@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.openapi.project.Project;
 
 import com.intellij.util.Query;
+import loggingcomponents.LoggingComponents;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,12 @@ public class ExceptionLoggingMetrics {
         this.project = logStmt.getProject();
         this.exceptionTypes = deriveExceptionTypes(logStmt);
         this.exceptionMethods = resolveExceptionMethods(logStmt);
-        this.logLevel = extractLogLevel(logStmt);
-        this.logText = extractLogText(logStmt);
-        this.logBody = extractLogBody(logStmt);
-        this.isStackTraceLogged = deriveIsStackTraceLogged(logStmt);
+        LoggingComponents logComponents = new LoggingComponents(logStmt);
+
+        this.logLevel = logComponents.getLogLevel();
+        this.logText = logComponents.getLogText();
+        this.logBody = logComponents.getLogBody();
+        this.isStackTraceLogged = logComponents.getIsStackTraceLogged();
 
         // debugging
         /*
@@ -1267,27 +1270,6 @@ public class ExceptionLoggingMetrics {
         return t1.getCanonicalText().equals(t2.getCanonicalText());
     }
 
-    private boolean isThrowableType(PsiType t) {
-        /*
-        String throwableText = "java.lang.Throwable";
-        if (t.getCanonicalText().equals(throwableText)) {
-            return true;
-        }
-
-        PsiType[] superTypes = t.getSuperTypes();
-        logger.debug("Throwable: " + throwableText);
-        for (PsiType superT : superTypes) {
-            logger.debug("Super type: " + superT.getCanonicalText());
-            if (superT.getCanonicalText().equals(throwableText)) {
-                return true;
-            }
-        }
-        return false;
-        */
-        PsiType throwable = PsiType.getTypeByName("java.lang.Throwable", this.project,
-                GlobalSearchScope.allScope(this.project));
-        return isSubType(t, throwable, false);
-    }
 
     private boolean isRuntimeExceptionType(PsiType t) {
         PsiType runtimeException = PsiType.getTypeByName("java.lang.RuntimeException", this.project,
@@ -1335,56 +1317,5 @@ public class ExceptionLoggingMetrics {
         return logStmt.getText();
     }
 
-    private boolean deriveIsStackTraceLogged(PsiMethodCallExpression logStmt) {
-        // exception variable of the containing catch block
-        // catch session
-        /*
-        PsiCatchSection catchSection = PsiTreeUtil.getParentOfType(logStmt, PsiCatchSection.class);
-        if (catchSection == null) {
-            return false;
-        }
-        PsiParameter exPara = PsiTreeUtil.getChildOfType(catchSection, PsiParameter.class);
-        if (exPara == null) {
-            return false;
-        }
-        String exName = PsiTreeUtil.getChildOfType(exPara, PsiIdentifier.class).getText();
-        */
-
-        // parameter lists of the logging statement
-        PsiExpressionList expressionList = PsiTreeUtil.getChildOfType(logStmt, PsiExpressionList.class);
-
-        // PsiReferenceExpression parameters (parameters simply refer to other variables, no method invocation or calculation)
-        PsiReferenceExpression[] referenceExpressions = PsiTreeUtil.getChildrenOfType(expressionList,
-                PsiReferenceExpression.class);
-
-        if (referenceExpressions == null || referenceExpressions.length == 0) {
-            return false;
-        }
-        for (PsiReferenceExpression expr : referenceExpressions) {
-            PsiElement resolvedElement = expr.getReference().resolve();
-            //logger.debug("Resolved element: " + resolvedElement.getText());
-            if (resolvedElement instanceof PsiVariable) {
-                //logger.debug("Resolved element is a PsiVariable instance.");
-                try {
-                    PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
-                            PsiTypeElement.class).getType();
-                    //logger.debug("Variable type: " + variableType.getCanonicalText());
-                    if (isThrowableType(variableType)) {
-                        //logger.debug("Variable type : " + variableType.getCanonicalText() + " is Throwable");
-                        return true;
-                    }
-                } catch (NullPointerException e) {
-                    return false;
-                }
-            }
-            /*
-            String expressionName = PsiTreeUtil.getChildOfType(expr, PsiIdentifier.class).getText();
-            if (expressionName.equals(exName)) {
-                return true;
-            }
-            */
-        }
-        return false;
-    }
 
 }
