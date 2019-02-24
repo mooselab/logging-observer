@@ -109,7 +109,7 @@ public class LoggingComponents {
                 if (expression instanceof PsiLiteralExpression) {
                     logString.append(((PsiLiteralExpression) expression).getValue().toString());
                 } else if (expression instanceof PsiPolyadicExpression) {
-                    logString.append(concatPolyadicExpressionToString((PsiPolyadicExpression)expression));
+                    logString.append(concatPolyadicExpressionToStringWithVarNames((PsiPolyadicExpression)expression));
                 } else if (expression instanceof PsiReferenceExpression) {
                     logString.append(PsiTreeUtil.getChildOfType(expression, PsiIdentifier.class).getText());
                 } else if(expression instanceof PsiMethodCallExpression) {
@@ -134,7 +134,7 @@ public class LoggingComponents {
             } else if (expression instanceof PsiLiteralExpression) {
                 vars.add(((PsiLiteralExpression) expression).getValue().toString());
             } else if (expression instanceof PsiPolyadicExpression) {
-                vars.add(concatPolyadicExpressionToString((PsiPolyadicExpression)expression));
+                vars.add(concatPolyadicExpressionToStringWithVarNames((PsiPolyadicExpression)expression));
             } else { // should not come here
                 vars.add(expression.getText());
             }
@@ -170,7 +170,7 @@ public class LoggingComponents {
         return combinedStr.toString();
     }
 
-    private String concatPolyadicExpressionToString(PsiPolyadicExpression polyadicExpression) {
+    private String concatPolyadicExpressionToStringWithVarNames(PsiPolyadicExpression polyadicExpression) {
         PsiExpression[] expressions = polyadicExpression.getOperands();
         StringBuilder logString = new StringBuilder();
 
@@ -184,7 +184,7 @@ public class LoggingComponents {
                         PsiReferenceExpression.class);
                 logString.append(PsiTreeUtil.getChildOfType(methodCallRef, PsiIdentifier.class).getText());
             } else if (expression instanceof PsiPolyadicExpression) {
-                logString.append(concatPolyadicExpressionToString((PsiPolyadicExpression)expression));
+                logString.append(concatPolyadicExpressionToStringWithVarNames((PsiPolyadicExpression)expression));
             }
         }
 
@@ -192,7 +192,157 @@ public class LoggingComponents {
     }
 
     private String extractLogStringWithVariableTypes(PsiMethodCallExpression logStmt) {
-        return "";
+        PsiExpressionList expressionList = logStmt.getArgumentList();
+        int argCount = expressionList.getExpressionCount();
+
+        StringBuilder logString = new StringBuilder();
+        boolean isFirstArg = true;
+        List<String> vars = new ArrayList<>();
+        for (PsiExpression expression : expressionList.getExpressions()) {
+            // get the log string (the first argument)
+            if (isFirstArg) {
+                if (expression instanceof PsiLiteralExpression) {
+                    logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                } else if (expression instanceof PsiPolyadicExpression) {
+                    logString.append(concatPolyadicExpressionToStringWithVarTypes((PsiPolyadicExpression)expression));
+                } else if (expression instanceof PsiReferenceExpression) {
+                    //logString.append(PsiTreeUtil.getChildOfType(expression, PsiIdentifier.class).getText());
+                    PsiElement resolvedElement = expression.getReference().resolve();
+                    if (resolvedElement == null) {
+                        logString.append("UnresolvableVariable");
+                        continue;
+                    }
+                    if (resolvedElement instanceof PsiVariable) {
+                        try {
+                            PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                                    PsiTypeElement.class).getType();
+                            logString.append(variableType.getPresentableText());
+                        } catch (NullPointerException e) {
+                            logString.append("UnresolvableVariable");
+                        }
+                    } else {
+                        logString.append("NotAVariable");
+                    }
+                } else if(expression instanceof PsiMethodCallExpression) {
+                    PsiMethod method = ((PsiMethodCallExpression) expression).resolveMethod();
+                    if (method == null) {
+                        logString.append("UnresolvableMethodCall");
+                        continue;
+                    }
+                    String returnType = method.getReturnType().getPresentableText();
+                    logString.append(returnType);
+                }
+                else { // should not come here
+                    logString.append(expression.getText());
+                }
+                isFirstArg = false;
+                continue;
+            }
+
+            // get the variables
+            if (expression instanceof PsiReferenceExpression) {
+                //vars.add(PsiTreeUtil.getChildOfType(expression, PsiIdentifier.class).getText());
+                PsiElement resolvedElement = expression.getReference().resolve();
+                if (resolvedElement == null) {
+                    vars.add("UnresolvableVariable");
+                    continue;
+                }
+                if (resolvedElement instanceof PsiVariable) {
+                    try {
+                        PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                                PsiTypeElement.class).getType();
+                        vars.add(variableType.getPresentableText());
+                    } catch (NullPointerException e) {
+                        vars.add("UnresolvableVariable");
+                    }
+                } else {
+                    vars.add("NotAVariable");
+                }
+            } else if(expression instanceof PsiMethodCallExpression) {
+                PsiMethod method = ((PsiMethodCallExpression) expression).resolveMethod();
+                if (method == null) {
+                    vars.add("UnresolvableMethodCall");
+                    continue;
+                }
+                String returnType = method.getReturnType().getPresentableText();
+                vars.add(returnType);
+            } else if (expression instanceof PsiLiteralExpression) {
+                vars.add(((PsiLiteralExpression) expression).getValue().toString());
+            } else if (expression instanceof PsiPolyadicExpression) {
+                vars.add(concatPolyadicExpressionToStringWithVarTypes((PsiPolyadicExpression)expression));
+            } else { // should not come here
+                vars.add(expression.getText());
+            }
+        }
+
+        if (vars.size() == 0) {
+            return logString.toString();
+        }
+
+        // replace the place holders ("{}") in the log string with the variables
+        Pattern pPlaceHolder = Pattern.compile("\\{\\}");
+        Matcher mPlaceHolder = pPlaceHolder.matcher(logString);
+        int varIndex = 0;
+        StringBuffer combinedStr = new StringBuffer();
+        while (mPlaceHolder.find()) {
+            //int start = mPlaceHolder.start();
+            //int end = mPlaceHolder.end();
+            mPlaceHolder.appendReplacement(combinedStr, vars.get(varIndex));
+            varIndex += 1;
+            if (varIndex >= vars.size()) {
+                break;
+            }
+        }
+        mPlaceHolder.appendTail(combinedStr);
+
+        // add the exception, if any, and other remaining vars to the end of the string
+        if (varIndex < vars.size()) {
+            for (String var : vars.subList(varIndex, vars.size())) {
+                combinedStr.append(" ").append(var);
+            }
+        }
+
+        return combinedStr.toString();
+    }
+
+    private String concatPolyadicExpressionToStringWithVarTypes(PsiPolyadicExpression polyadicExpression) {
+        PsiExpression[] expressions = polyadicExpression.getOperands();
+        StringBuilder logString = new StringBuilder();
+
+        for (PsiExpression expression : expressions) {
+            if (expression instanceof PsiLiteralExpression) {
+                logString.append(((PsiLiteralExpression) expression).getValue().toString());
+            } else if (expression instanceof PsiReferenceExpression) {
+                PsiElement resolvedElement = expression.getReference().resolve();
+                if (resolvedElement == null) {
+                    logString.append("UnresolvableVariable");
+                    continue;
+                }
+                if (resolvedElement instanceof PsiVariable) {
+                    try {
+                        PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                                PsiTypeElement.class).getType();
+                        logString.append(variableType.getPresentableText());
+                    } catch (NullPointerException e) {
+                        logString.append("UnresolvableVariable");
+                    }
+                } else {
+                    logString.append("NotAVariable");
+                }
+            } else if(expression instanceof PsiMethodCallExpression) {
+                PsiMethod method = ((PsiMethodCallExpression) expression).resolveMethod();
+                if (method == null) {
+                    logString.append("UnresolvableMethodCall");
+                    continue;
+                }
+                String returnType = method.getReturnType().getPresentableText();
+                logString.append(returnType);
+            } else if (expression instanceof PsiPolyadicExpression) {
+                logString.append(concatPolyadicExpressionToStringWithVarTypes((PsiPolyadicExpression)expression));
+            }
+        }
+
+        return logString.toString();
     }
 
     private String extractLogBody(PsiMethodCallExpression logStmt) {
