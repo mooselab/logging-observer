@@ -7,9 +7,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import loggingcomponents.LoggingComponents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import searchlogging.LoggingSearchUtils;
@@ -32,6 +34,7 @@ public class FindLoggingStatements extends AnAction {
         // find all logging statements in the project
         List<PsiMethodCallExpression> loggingStatements = findLoggingStatementsInFiles(project);
 
+        /*
         StringBuilder loggingStatementsStr = new StringBuilder();
         loggingStatementsStr.append("Logging statements in Project " + project.getName() + ":\n");
 
@@ -39,6 +42,17 @@ public class FindLoggingStatements extends AnAction {
             loggingStatementsStr.append(loggingStatement.getText()).append("\n");
         }
         logger.info(loggingStatementsStr.toString());
+        */
+
+        // get the logging components of each logging statement
+        StringBuilder loggingStatementsStr = new StringBuilder();
+        loggingStatementsStr.append(LoggingComponents.getLogComponentsHeader()).append("\n");
+        for (PsiMethodCallExpression log : loggingStatements) {
+            // get the components of the logging statement
+            LoggingComponents metrics = new LoggingComponents(log);
+            loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
+        }
+        logger.info("Logging metrics for project " + projectName + ":\n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,

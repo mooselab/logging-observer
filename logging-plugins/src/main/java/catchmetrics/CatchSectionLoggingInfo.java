@@ -5,6 +5,7 @@ import com.intellij.psi.PsiCatchSection;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PsiTreeUtil;
+import common.Locators;
 import exceptionloggingmetrics.ExceptionLoggingMetrics;
 import loggingcomponents.LoggingComponents;
 
@@ -74,7 +75,7 @@ public class CatchSectionLoggingInfo {
     public String getCatchSectionLoggingInfo() {
         List<String> logInfo = new ArrayList<>();
 
-        logInfo.add(ExceptionLoggingMetrics.getLocationInFile(this.catchSection));
+        logInfo.add(Locators.getLocationInFile(this.catchSection));
         logInfo.add(this.getExceptionTypeStr());
         logInfo.add(String.valueOf(this.isLogged));
         logInfo.add(String.valueOf(this.isStackTraceLogged));

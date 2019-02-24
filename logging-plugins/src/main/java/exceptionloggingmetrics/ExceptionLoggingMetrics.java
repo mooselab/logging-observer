@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import common.Locators;
+
 public class ExceptionLoggingMetrics {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionLoggingMetrics.class);
 
@@ -42,7 +44,7 @@ public class ExceptionLoggingMetrics {
 
         LoggingComponents logComponents = new LoggingComponents(logStmt);
         this.logLevel = logComponents.getLogLevel();
-        this.logText = logComponents.getLogText();
+        this.logText = logComponents.getLogStringWithoutVariables();
         this.logBody = logComponents.getLogBody();
         this.isStackTraceLogged = logComponents.getIsStackTraceLogged();
 
@@ -116,10 +118,10 @@ public class ExceptionLoggingMetrics {
         List<String> metrics = new ArrayList<>();
 
         // location of the containing catch section
-        metrics.add(getLocationInFile(this.catchSection));
+        metrics.add(Locators.getLocationInFile(this.catchSection));
 
         // log identification/index
-        String fileLocation = getLocationInFile(this.logStmt);
+        String fileLocation = Locators.getLocationInFile(this.logStmt);
         metrics.add(fileLocation);
 
         // response variables
@@ -185,12 +187,6 @@ public class ExceptionLoggingMetrics {
         return String.join(",", logComponents);
     }
 
-    @NotNull
-    public static String getLocationInFile(PsiElement element) {
-        PsiFile psiFile = element.getContainingFile();
-        int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), element.getTextOffset()) + 1;
-        return psiFile.getVirtualFile().getName() + ":" + lineNumber;
-    }
 
     public List<PsiType> getExceptionTypes() {return this.exceptionTypes;}
     public List<PsiMethod> getExceptionMethods() {return this.exceptionMethods;}
@@ -577,7 +573,7 @@ public class ExceptionLoggingMetrics {
 
             if (classInitializer == null) {
                 logger.warn("Could not find containing method or class initializer of logging statement at: " +
-                        getLocationInFile(this.logStmt));
+                        Locators.getLocationInFile(this.logStmt));
                 return 0;
             }
 
