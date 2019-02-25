@@ -80,6 +80,7 @@ public class LoggingComponents {
         return logMethodName;
     }
 
+    /*
     private String extractLogStringWithoutVariables(PsiMethodCallExpression logStmt) {
         PsiExpressionList expressionList = logStmt.getArgumentList();
         Collection<PsiLiteralExpression> literalExpressions =
@@ -88,12 +89,73 @@ public class LoggingComponents {
             return literalExpressions.stream()
                 .map( l -> {
                     Object value = l.getValue();
-                    return (value == null) ? "" : value.toString();
+                    //return (value == null) ? "" : value.toString();
+                    return (value == null) ? l.getText() : value.toString();
                 })
                 .collect(Collectors.joining(" "));
         } else {
             return "";
         }
+    }
+    */
+
+    private String extractLogStringWithoutVariables(PsiMethodCallExpression logStmt) {
+        PsiExpressionList expressionList = logStmt.getArgumentList();
+        int argCount = expressionList.getExpressionCount();
+
+        StringBuilder logString = new StringBuilder();
+        boolean isFirstArg = true;
+        List<String> vars = new ArrayList<>();
+        PsiExpression expression = expressionList.getExpressions()[0]; // get the first argument
+
+        if (expression instanceof PsiLiteralExpression) {
+            try {
+                logString.append(((PsiLiteralExpression) expression).getValue().toString());
+            } catch (NullPointerException e) {
+                logString.append(((PsiLiteralExpression) expression).getText());
+            }
+        } else if (expression instanceof PsiPolyadicExpression) {
+            logString.append(concatPolyadicExpressionToStringWithoutVariables((PsiPolyadicExpression)expression));
+        } else {
+            // should not come here
+        }
+
+        if (argCount == 1) {
+            return logString.toString();
+        }
+
+        // remove the place holders ("{}") in the log string
+
+        // first remove " {}"
+        Pattern pPlaceHolder = Pattern.compile(" \\{\\}");
+        Matcher mPlaceHolder = pPlaceHolder.matcher(logString);
+        String resultStr = new String(mPlaceHolder.replaceAll(""));
+
+        // then remove "{}"
+        Pattern pPlaceHolder2 = Pattern.compile("\\{\\}");
+        Matcher mPlaceHolder2 = pPlaceHolder2.matcher(resultStr);
+        String resultStr2 = new String(mPlaceHolder2.replaceAll(""));
+
+        return resultStr2;
+    }
+
+    private String concatPolyadicExpressionToStringWithoutVariables(PsiPolyadicExpression polyadicExpression) {
+        PsiExpression[] expressions = polyadicExpression.getOperands();
+        StringBuilder logString = new StringBuilder();
+
+        for (PsiExpression expression : expressions) {
+            if (expression instanceof PsiLiteralExpression) {
+                try {
+                    logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                } catch (NullPointerException e) {
+                    logString.append(((PsiLiteralExpression) expression).getText());
+                }
+            } else if (expression instanceof PsiPolyadicExpression) {
+                logString.append(concatPolyadicExpressionToStringWithoutVariables((PsiPolyadicExpression)expression));
+            }
+        }
+
+        return logString.toString();
     }
 
     private String extractLogStringWithVariableNames(PsiMethodCallExpression logStmt) {
@@ -107,7 +169,11 @@ public class LoggingComponents {
             // get the log string (the first argument)
             if (isFirstArg) {
                 if (expression instanceof PsiLiteralExpression) {
-                    logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                    try {
+                        logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                    } catch (NullPointerException e) {
+                        logString.append(((PsiLiteralExpression) expression).getText());
+                    }
                 } else if (expression instanceof PsiPolyadicExpression) {
                     logString.append(concatPolyadicExpressionToStringWithVarNames((PsiPolyadicExpression)expression));
                 } else if (expression instanceof PsiReferenceExpression) {
@@ -132,7 +198,11 @@ public class LoggingComponents {
                         PsiReferenceExpression.class);
                 vars.add(PsiTreeUtil.getChildOfType(methodCallRef, PsiIdentifier.class).getText());
             } else if (expression instanceof PsiLiteralExpression) {
-                vars.add(((PsiLiteralExpression) expression).getValue().toString());
+                try {
+                    vars.add(((PsiLiteralExpression) expression).getValue().toString());
+                } catch (NullPointerException e) {
+                    vars.add(((PsiLiteralExpression) expression).getText());
+                }
             } else if (expression instanceof PsiPolyadicExpression) {
                 vars.add(concatPolyadicExpressionToStringWithVarNames((PsiPolyadicExpression)expression));
             } else { // should not come here
@@ -176,7 +246,12 @@ public class LoggingComponents {
 
         for (PsiExpression expression : expressions) {
             if (expression instanceof PsiLiteralExpression) {
-                logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                try {
+                    logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                } catch (NullPointerException e) {
+                    logString.append(((PsiLiteralExpression) expression).getText());
+                }
+
             } else if (expression instanceof PsiReferenceExpression) {
                 logString.append(PsiTreeUtil.getChildOfType(expression, PsiIdentifier.class).getText());
             } else if(expression instanceof PsiMethodCallExpression) {
@@ -202,7 +277,11 @@ public class LoggingComponents {
             // get the log string (the first argument)
             if (isFirstArg) {
                 if (expression instanceof PsiLiteralExpression) {
-                    logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                    try {
+                        logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                    } catch (NullPointerException e) {
+                        logString.append(((PsiLiteralExpression) expression).getText());
+                    }
                 } else if (expression instanceof PsiPolyadicExpression) {
                     logString.append(concatPolyadicExpressionToStringWithVarTypes((PsiPolyadicExpression)expression));
                 } else if (expression instanceof PsiReferenceExpression) {
@@ -214,11 +293,12 @@ public class LoggingComponents {
                     }
                     if (resolvedElement instanceof PsiVariable) {
                         try {
-                            PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
-                                    PsiTypeElement.class).getType();
+                            //PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                            //        PsiTypeElement.class).getType();
+                            PsiType variableType = ((PsiVariable)resolvedElement).getType();
                             logString.append(variableType.getPresentableText());
                         } catch (NullPointerException e) {
-                            logString.append("UnresolvableVariable");
+                            logString.append("UnresolvableVariableNoType");
                         }
                     } else {
                         logString.append("NotAVariable");
@@ -242,18 +322,20 @@ public class LoggingComponents {
             // get the variables
             if (expression instanceof PsiReferenceExpression) {
                 //vars.add(PsiTreeUtil.getChildOfType(expression, PsiIdentifier.class).getText());
-                PsiElement resolvedElement = expression.getReference().resolve();
+                //PsiElement resolvedElement = expression.getReference().resolve();
+                PsiElement resolvedElement = ((PsiReferenceExpression)expression).resolve();
                 if (resolvedElement == null) {
                     vars.add("UnresolvableVariable");
                     continue;
                 }
                 if (resolvedElement instanceof PsiVariable) {
                     try {
-                        PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
-                                PsiTypeElement.class).getType();
+                        //PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                        //        PsiTypeElement.class).getType();
+                        PsiType variableType = ((PsiVariable)resolvedElement).getType();
                         vars.add(variableType.getPresentableText());
                     } catch (NullPointerException e) {
-                        vars.add("UnresolvableVariable");
+                        vars.add("UnresolvableVariableNoType");
                     }
                 } else {
                     vars.add("NotAVariable");
@@ -267,7 +349,11 @@ public class LoggingComponents {
                 String returnType = method.getReturnType().getPresentableText();
                 vars.add(returnType);
             } else if (expression instanceof PsiLiteralExpression) {
-                vars.add(((PsiLiteralExpression) expression).getValue().toString());
+                try {
+                    vars.add(((PsiLiteralExpression) expression).getValue().toString());
+                } catch (NullPointerException e) {
+                    logString.append(((PsiLiteralExpression) expression).getText());
+                }
             } else if (expression instanceof PsiPolyadicExpression) {
                 vars.add(concatPolyadicExpressionToStringWithVarTypes((PsiPolyadicExpression)expression));
             } else { // should not come here
@@ -311,7 +397,11 @@ public class LoggingComponents {
 
         for (PsiExpression expression : expressions) {
             if (expression instanceof PsiLiteralExpression) {
-                logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                try {
+                    logString.append(((PsiLiteralExpression) expression).getValue().toString());
+                } catch (NullPointerException e) {
+                    logString.append(((PsiLiteralExpression) expression).getText());
+                }
             } else if (expression instanceof PsiReferenceExpression) {
                 PsiElement resolvedElement = expression.getReference().resolve();
                 if (resolvedElement == null) {
@@ -320,11 +410,12 @@ public class LoggingComponents {
                 }
                 if (resolvedElement instanceof PsiVariable) {
                     try {
-                        PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
-                                PsiTypeElement.class).getType();
+                        //PsiType variableType = PsiTreeUtil.findChildOfType((PsiVariable) resolvedElement,
+                        //        PsiTypeElement.class).getType();
+                        PsiType variableType = ((PsiVariable)resolvedElement).getType();
                         logString.append(variableType.getPresentableText());
                     } catch (NullPointerException e) {
-                        logString.append("UnresolvableVariable");
+                        logString.append("UnresolvableVariableNoType");
                     }
                 } else {
                     logString.append("NotAVariable");
@@ -355,6 +446,8 @@ public class LoggingComponents {
         PsiExpressionList expressionList = PsiTreeUtil.getChildOfType(logStmt, PsiExpressionList.class);
 
         // PsiReferenceExpression parameters (parameters simply refer to other variables, no method invocation or calculation)
+        // getChildrenOfType gets the PsiReferenceExpression (e.g., e) in a non-recursive way.
+        // Thus expressions involving e (e.g., e.getMessage()) won't be counted.
         PsiReferenceExpression[] referenceExpressions = PsiTreeUtil.getChildrenOfType(expressionList,
                 PsiReferenceExpression.class);
 
