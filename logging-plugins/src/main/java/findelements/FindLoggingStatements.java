@@ -44,13 +44,17 @@ public class FindLoggingStatements extends AnAction {
         logger.info(loggingStatementsStr.toString());
         */
 
+
         // get the logging components of each logging statement
         StringBuilder loggingStatementsStr = new StringBuilder();
-        loggingStatementsStr.append(LoggingComponents.getLogComponentsHeader()).append("\n");
+        //loggingStatementsStr.append(LoggingComponents.getLogComponentsHeader()).append("\n");
         for (PsiMethodCallExpression log : loggingStatements) {
             // get the components of the logging statement
             LoggingComponents metrics = new LoggingComponents(log);
-            loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
+            //loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
+            loggingStatementsStr.append("Method:").append("\n").append(metrics.getContainingMethod()).append("\n");
+            loggingStatementsStr.append("Logging:").append("\n").append(metrics.getLogBody()).append("\n\n");
+
         }
         logger.info("Logging metrics for project " + projectName + ":\n" + loggingStatementsStr);
 

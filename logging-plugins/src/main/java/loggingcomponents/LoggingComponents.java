@@ -44,7 +44,7 @@ public class LoggingComponents {
         List<String> componentsHeader = new ArrayList<>();
 
         componentsHeader.add("logLocation");
-        componentsHeader.add("logBody");
+        //componentsHeader.add("logBody");
         componentsHeader.add("logLevel");
         componentsHeader.add("logStringWithoutVariables");
         componentsHeader.add("logStringWithVariableNames");
@@ -57,11 +57,11 @@ public class LoggingComponents {
         List<String> logComponents = new ArrayList<>();
 
         logComponents.add(Locators.getLocationInFile(this.logStmt));
-        logComponents.add(getLogBody());
+        //logComponents.add(getLogBody());
         logComponents.add(getLogLevel());
-        logComponents.add(getLogStringWithoutVariables());
-        logComponents.add(getLogStringWithVariableNames());
-        logComponents.add(getLogStringWithVariableTypes());
+        logComponents.add(getLogStringWithoutVariables().replaceAll("\\r\\n|\\r|\\n", " "));
+        logComponents.add(getLogStringWithVariableNames().replaceAll("\\r\\n|\\r|\\n", " "));
+        logComponents.add(getLogStringWithVariableTypes().replaceAll("\\r\\n|\\r|\\n", " "));
 
         return String.join(";;;", logComponents);
     }
@@ -73,6 +73,7 @@ public class LoggingComponents {
     public String getLogStringWithVariableTypes() { return this.logStringWithVariableTypes; }
     public String getLogBody() { return this.logBody; }
     public boolean getIsStackTraceLogged() {return this.isStackTraceLogged; }
+    public String getContainingMethod() {return this.extractContainingMethod(this.logStmt);}
 
     private String extractLogLevel(PsiMethodCallExpression logStmt) {
         PsiReferenceExpression methodCall = logStmt.getMethodExpression();
@@ -438,6 +439,14 @@ public class LoggingComponents {
 
     private String extractLogBody(PsiMethodCallExpression logStmt) {
         return logStmt.getText();
+    }
+
+    private String extractContainingMethod(PsiMethodCallExpression logStmt) {
+        PsiMethod method = PsiTreeUtil.getParentOfType(logStmt, PsiMethod.class);
+        if (method!=null)
+            return method.getText();
+        else
+            return "";
     }
 
     private boolean extractIsStackTraceLogged(PsiMethodCallExpression logStmt) {
