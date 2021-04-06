@@ -1,8 +1,20 @@
-# README #
+# Logging Observer #
 
-This project develops plugins based on the IntelliJ IDEA platform.
+This project develops an IntelliJ plugin for searching and analyzing logging code in Java projects. The plugin is based on the [IntelliJ IDEA platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html).
 
-### What is this repository for? ###
+### What does the plugin provide? ###
+
+* Searching logging-related elements in a Java project.
+  - Searching all logging statements in the project.
+  - Searching all exception logging statements (logging statements in catch blocks).
+  - etc.
+
+* Analyzing logging code
+  - Analyzing logging components (e.g., log level, text, variables, stack traces)
+  - Analyzing logging-related code metrics (e.g., exception type, containing code blocks)
+  - etc.
+
+### How to use the plugin? ###
 
 * Quick summary
 * Version
