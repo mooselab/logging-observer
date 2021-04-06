@@ -105,8 +105,12 @@ public class LoggingSearchUtils {
             usages.add(usage);
         }
 
+        UsageViewPresentation presentation = new UsageViewPresentation();
+        presentation.setTabName("Search result");
+        presentation.setTabText("Found " + usages.size() + " instances");
+        presentation.setToolwindowTitle("Search result");
         UsageViewManager.getInstance(project).showUsages(
-                UsageTarget.EMPTY_ARRAY, usages.toArray(new Usage[usages.size()]), new UsageViewPresentation());
+                UsageTarget.EMPTY_ARRAY, usages.toArray(new Usage[usages.size()]), presentation);
     }
 
     /**
@@ -123,8 +127,12 @@ public class LoggingSearchUtils {
             usages.add(usage);
         }
 
+        UsageViewPresentation presentation = new UsageViewPresentation();
+        presentation.setTabName("Search result");
+        presentation.setTabText("Found " + usages.size() + " instances");
+        presentation.setToolwindowTitle("Search result");
         UsageViewManager.getInstance(project).showUsages(
-                UsageTarget.EMPTY_ARRAY, usages.toArray(new Usage[usages.size()]), new UsageViewPresentation());
+                UsageTarget.EMPTY_ARRAY, usages.toArray(new Usage[usages.size()]), presentation);
     }
 
 }
