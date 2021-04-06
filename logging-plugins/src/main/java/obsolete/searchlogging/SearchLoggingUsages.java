@@ -1,4 +1,4 @@
-package searchlogging;
+package obsolete.searchlogging;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,22 +30,6 @@ public class SearchLoggingUsages extends AnAction {
         String projectName = project.getName();
         logger.info("Start to search logging statements in project " + projectName +".");
 
-
-/*        // get all java files in a project
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(
-                FileTypeIndex.NAME,
-                JavaFileType.INSTANCE,
-                GlobalSearchScope.projectScope(project)
-        );
-        int nFiles = virtualFiles.size();
-        *//*
-        StringBuilder filenames = new StringBuilder();
-        for (VirtualFile virtualFile : virtualFiles) {
-            filenames.append(virtualFile.getPath() + "\n");
-        }
-        *//*
-        logger.info("The project " + projectName + " has " + nFiles + " Java files.");*/
-
         // find all logging statements in the project
         List<PsiMethodCallExpression> loggingStatements = LoggingSearchUtils.findLoggingStatementsInProject(project);
 
@@ -62,8 +46,6 @@ public class SearchLoggingUsages extends AnAction {
         for (PsiMethodCallExpression log : loggingStatements) {
             PsiFile psiFile = log.getContainingFile();
             int lineNumber = StringUtil.offsetToLineNumber(psiFile.getText(), log.getTextOffset()) + 1;
-            //loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append("\n");
-            //loggingStatementsStr.append(log.getText()).append(("\n"));
 
             // get the location of the logging statement
             //loggingStatementsStr.append(psiFile.getVirtualFile().getPath()).append(":").append(lineNumber).append(":");
@@ -71,22 +53,12 @@ public class SearchLoggingUsages extends AnAction {
             // get the components of the logging statement
             LoggingComponents metrics = new LoggingComponents(log);
             loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
-
-            /*
-            loggingStatementsStr.append(log.getMethodExpression().getText()).append("\n");
-            loggingStatementsStr.append(log.getMethodExpression().toString()).append("\n");
-            String methodStr = log.getMethodExpression().getText();
-            if (methodStr.matches(".*\\.(trace|debug|info|warn|error|fatal)")) {
-                loggingStatementsStr.append(methodStr.substring(methodStr.lastIndexOf('.')+1)).append("\n");
-            }
-            */
         }
         //logger.debug("\"Logger\" occurrences: \n{}", loggers);
         logger.info("Logging metrics for project " + projectName + ":\n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
         LoggingSearchUtils.listPsiMethodCallExpressionsInFindToolWindow(project, loggingStatements);
-
     }
 
     @Override

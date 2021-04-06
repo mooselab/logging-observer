@@ -14,7 +14,6 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
-import searchlogging.LoggingSearchUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,6 @@ public class FindJavaSourceFiles extends AnAction {
         String projectName = project.getName();
         logger.info("Start to find Java source files in project " + projectName +".");
 
-        // find all logging statements in the project
         List<PsiFile> psiFiles = findJavaSourceFilesInProject(project);
 
         StringBuilder files = new StringBuilder();
@@ -41,7 +39,7 @@ public class FindJavaSourceFiles extends AnAction {
         }
         logger.info(files.toString());
 
-        // list the logging statements in the find tool window view
+        // list the searched items in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,
                 psiFiles.stream().map(e -> (PsiElement)e).collect(Collectors.toList()));
     }
@@ -54,11 +52,7 @@ public class FindJavaSourceFiles extends AnAction {
     }
 
     public static List<PsiFile> findJavaSourceFilesInProject(Project project) {
-        //List<PsiCatchSection> catchSections = new ArrayList<>();
         List<PsiFile> psiFiles = new ArrayList<>();
-
-        //StringBuilder files = new StringBuilder();
-        //files.append("Files in Project " + project.getName() + ":\n");
 
         ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
         projectFileIndex.iterateContent(new ContentIterator() {
@@ -77,14 +71,10 @@ public class FindJavaSourceFiles extends AnAction {
 
                     psiFiles.add(psiFile);
 
-                    //files.append(fileName).append("\n");
-
                 }
                 return true;
             }
         });
-
-        //logger.info(files.toString());
 
         return psiFiles;
     }

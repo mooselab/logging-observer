@@ -44,11 +44,11 @@ public class LoggingComponents {
         List<String> componentsHeader = new ArrayList<>();
 
         componentsHeader.add("logLocation");
-        //componentsHeader.add("logBody");
+        componentsHeader.add("logBody");
         componentsHeader.add("logLevel");
-        componentsHeader.add("logStringWithoutVariables");
+        //componentsHeader.add("logStringWithoutVariables");
         componentsHeader.add("logStringWithVariableNames");
-        componentsHeader.add("logStringWithVariableTypes");
+        //componentsHeader.add("logStringWithVariableTypes");
 
         return String.join(";;;", componentsHeader);
     }
@@ -57,11 +57,11 @@ public class LoggingComponents {
         List<String> logComponents = new ArrayList<>();
 
         logComponents.add(Locators.getLocationInFile(this.logStmt));
-        //logComponents.add(getLogBody());
+        logComponents.add(getLogBody());
         logComponents.add(getLogLevel());
-        logComponents.add(getLogStringWithoutVariables().replaceAll("\\r\\n|\\r|\\n", " "));
+        //logComponents.add(getLogStringWithoutVariables().replaceAll("\\r\\n|\\r|\\n", " "));
         logComponents.add(getLogStringWithVariableNames().replaceAll("\\r\\n|\\r|\\n", " "));
-        logComponents.add(getLogStringWithVariableTypes().replaceAll("\\r\\n|\\r|\\n", " "));
+        //logComponents.add(getLogStringWithVariableTypes().replaceAll("\\r\\n|\\r|\\n", " "));
 
         return String.join(";;;", logComponents);
     }
@@ -71,7 +71,7 @@ public class LoggingComponents {
     public String getLogStringWithoutVariables() { return this.logStringWithoutVariables; }
     public String getLogStringWithVariableNames() { return this.logStringWithVariableNames; }
     public String getLogStringWithVariableTypes() { return this.logStringWithVariableTypes; }
-    public String getLogBody() { return this.logBody; }
+    public String getLogBody() { return this.logBody.replaceAll("\\r\\n|\\r|\\n", " "); }
     public boolean getIsStackTraceLogged() {return this.isStackTraceLogged; }
     public String getContainingMethod() {return this.extractContainingMethod(this.logStmt);}
 

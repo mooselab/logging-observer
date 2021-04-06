@@ -13,7 +13,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
-import searchlogging.LoggingSearchUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,6 @@ public class FindJavaCatchSections extends AnAction {
         String projectName = project.getName();
         logger.info("Start to find Java catch sections in project " + projectName +".");
 
-        // find all logging statements in the project
         List<PsiCatchSection> psiCatchSections = findCatchSectionsInJavaProject(project);
 
         /*
@@ -53,7 +51,7 @@ public class FindJavaCatchSections extends AnAction {
 
         logger.info("Catch section log info for project " + projectName + ": \n" + catchInfoStr);
 
-        // list the logging statements in the find tool window view
+        // list all the searched items in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,
                 psiCatchSections.stream().map(e -> (PsiElement)e).collect(Collectors.toList()));
     }
@@ -67,9 +65,6 @@ public class FindJavaCatchSections extends AnAction {
 
     public static List<PsiCatchSection> findCatchSectionsInJavaProject(Project project) {
         List<PsiCatchSection> catchSections = new ArrayList<>();
-
-        //StringBuilder files = new StringBuilder();
-        //files.append("Files in Project " + project.getName() + ":\n");
 
         ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
         projectFileIndex.iterateContent(new ContentIterator() {
@@ -92,15 +87,10 @@ public class FindJavaCatchSections extends AnAction {
                     }
 
                     catchSections.addAll(catchSectionsInFile);
-
-                    //files.append(fileName).append("\n");
-
                 }
                 return true;
             }
         });
-
-        //logger.info(files.toString());
 
         return catchSections;
     }

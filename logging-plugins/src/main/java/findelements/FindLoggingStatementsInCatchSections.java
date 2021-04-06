@@ -13,7 +13,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import exceptionloggingmetrics.ExceptionLoggingMetrics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
-import searchlogging.LoggingSearchUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,8 +30,9 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
         String projectName = project.getName();
         logger.info("Start to find logging statements in catch sections in project " + projectName +".");
 
-        // find all logging statements in the project
+        // find exception logging statements in the project
         List<PsiMethodCallExpression> loggingStatements = findLoggingStatementsInCatchSections(project);
+
         /*
         StringBuilder loggingStatementsStr = new StringBuilder();
         loggingStatementsStr.append("Logging statements in catch sections in Project " + project.getName() + ":\n");
@@ -46,13 +46,10 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
         StringBuilder loggingStatementsStr = new StringBuilder();
         loggingStatementsStr.append(ExceptionLoggingMetrics.getLoggingMetricsHeader()).append(("\n"));
         for (PsiMethodCallExpression log : loggingStatements) {
-
             ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
-
             loggingStatementsStr.append(metrics.getLoggingMetrics()).append("\n");
         }
         logger.info("Exception logging metrics for project " + projectName + ": \n" + loggingStatementsStr);
-
 
         // list the logging statements in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,
@@ -67,7 +64,6 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
     }
 
     public static List<PsiMethodCallExpression> findLoggingStatementsInCatchSections(Project project) {
-        //List<PsiCatchSection> catchSections = new ArrayList<>();
         List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
 
         // Pattern for matching logging statements
@@ -93,26 +89,17 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
                         return true;
                     }
 
-                    //catchSections.addAll(catchSectionsInFile);
-
                     for (PsiCatchSection catchSection : catchSectionsInFile) {
-                        //Collection<PsiMethodCallExpression> methodCallsInCatch =
-                        //        PsiTreeUtil.findChildrenOfType(catchSection, PsiMethodCallExpression.class);
                         PsiTreeUtil.findChildrenOfType(catchSection, PsiMethodCallExpression.class).forEach(m -> {
                             if (pLog.matcher(m.getMethodExpression().getText()).matches()) {
                                 loggingStatements.add(m);
                             }
                         });
                     }
-
-                    //files.append(fileName).append("\n");
-
                 }
                 return true;
             }
         });
-
-        //logger.info(files.toString());
 
         return loggingStatements;
     }
