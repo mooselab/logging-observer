@@ -16,12 +16,15 @@ This project develops an IntelliJ plugin (*Logging Observer*) for searching and 
 
 ### How to use *Logging Observer*? ###
 
-The current version of *Logging Observer* is developed as an IDEA IntelliJ platform plugin. 
+The current version of *Logging Observer* is developed as an IDEA IntelliJ platform plugin. Pleaes check how to [Install Intellij plugins from repository or disk](https://www.jetbrains.com/help/idea/managing-plugins.html).
 
 ### How do I get set up? ###
 
-You can either install the plugin from IDEA's market place or build the plugin locally and install it from your disk
+You can install the plugin from IDEA's market place, download the package from this GitHub repo, or build the plugin locally.
 * Install the *Logging Observer* plugin from IDEA market place
+  - Plugin URL: https://plugins.jetbrains.com/plugin/16479-logging-observer
+* Download the plugin from this repository
+  - Get the latest version from the path logging-observer-intellij-plugin/build/distributions/
 * Build the *Logging Observer* plugin locally
   - Configuration
   - Dependencies
