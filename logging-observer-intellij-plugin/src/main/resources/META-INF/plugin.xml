@@ -1,15 +1,15 @@
 <idea-plugin>
-    <id>org.queensu.logging-plugins</id>
-    <name>Logging Plugins</name>
+    <id>org.mooselab.logging-observer</id>
+    <name>Logging Observer</name>
     <version>1.0</version>
-    <vendor email="heng.li@queensu.ca" url="hengli.org">Queen's University</vendor>
+    <vendor email="moose.researchlab@gmail.com" url="hengli.org">SAIL &amp; MOOSE Labs</vendor>
 
     <description><![CDATA[
-    Plugins for logging improvements.<br>
+    Plugin for logging search and analysis.<br>
     <em>A research project.</em>
     ]]></description>
 
-    <change-notes>Initial commit</change-notes>
+    <change-notes>Initial release</change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->

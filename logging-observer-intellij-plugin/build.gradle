@@ -2,7 +2,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.7.2'
 }
 
-group 'org.queensu'
+group 'org.mooselab'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
@@ -28,8 +28,14 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      Initial version of the plugin. Features include:<br>
+      <ol>
+      <li> Search all logging statements in the project and extract logging components. </li>
+      <li> Search all exception logging statements in the project and extract context code metrics. </li>
+      <li> Find all exception/catch blocks. </li>
+      <li> Find all Java source files. </li>
+      </ol>
+      """
 }
 
 test {
