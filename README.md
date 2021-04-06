@@ -1,8 +1,8 @@
 # Logging Observer #
 
-This project develops an IntelliJ plugin for searching and analyzing logging code in Java projects. The plugin is based on the [IntelliJ IDEA platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html).
+This project develops an IntelliJ plugin (*Logging Observer*) for searching and analyzing logging code in Java projects. The plugin is based on the [IntelliJ IDEA platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html).
 
-### What does the plugin provide? ###
+### What does *Logging Observer* provide? ###
 
 * Searching logging-related elements in a Java project.
   - Searching all logging statements in the project.
@@ -14,28 +14,27 @@ This project develops an IntelliJ plugin for searching and analyzing logging cod
   - Analyzing logging-related code metrics (e.g., exception type, containing code blocks)
   - etc.
 
-### How to use the plugin? ###
+### How to use *Logging Observer*? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+The current version of *Logging Observer* is developed as an IDEA IntelliJ platform plugin. 
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+You can either install the plugin from IDEA's market place or build the plugin locally and install it from your disk
+* Install the *Logging Observer* plugin from IDEA market place
+* Build the *Logging Observer* plugin locally
+  - Configuration
+  - Dependencies
+  - Install
 
 ### Contribution guidelines ###
 
+* Adding more features to the plugin
 * Writing tests
-* Code review
-* Other guidelines
+* Migrate *Logging Observer* to other platforms (e.g., Eclipse, or as a standard-alone tool)
+* Providing coding or feature suggestions
 
-### Who do I talk to? ###
+### Contact ###
 
-* Repo owner or admin
-* Other community or team contact
+* Send messages to the repo owner 
+* Send email to moose<dot>researchlab<at>gmail.com
