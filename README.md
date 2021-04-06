@@ -37,4 +37,4 @@ You can either install the plugin from IDEA's market place or build the plugin l
 ### Contact ###
 
 * Send messages to the repo owner 
-* Send email to moose<dot>researchlab<at>gmail.com
+* Send email to moose\<dot\>researchlab\<at\>gmail.com
