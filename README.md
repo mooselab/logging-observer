@@ -13,6 +13,8 @@ This project develops an IntelliJ plugin (*Logging Observer*) for searching and 
   - Analyzing logging components (e.g., log level, text, variables, stack traces)
   - Analyzing logging-related code metrics (e.g., exception type, containing code blocks)
   - etc.
+ 
+* More to come ...
 
 ### How to use *Logging Observer*? ###
 
