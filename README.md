@@ -32,7 +32,7 @@ You can install the plugin from IDEA's market place, download the package from t
     This plugin depends on IntelliJ, Intellij Platform SDK, Gradle, SLF4J, Logback, and JUnit.
   - Build the plugin.
     - Use Gradle Intellij Plugin: open `Gradle` panel, then run the `build` task.
-    - Use stand-alone Gradle: go to folder `logging-observer-intellij-plugin', then run `gradle build`.
+    - Use stand-alone Gradle: go to folder `logging-observer-intellij-plugin`, then run `gradle build`.
     - The built plugin distribution will be in the `logging-observer-intellij-plugin/build/distributions/' folder.
 
 ### Contribution guidelines ###
