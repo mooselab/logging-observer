@@ -41,12 +41,30 @@
         </group>
         -->
 
-        <group id="LoggingPlugin.LogSearch" text="LogSearch" description="Find log-related elements">
-            <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="LogPlugin.FindAllLogs" class="findelements.FindLoggingStatements" text="Find All Logs" description="Find all the logging statements"/>
-            <action id="LogPlugin.FindLoggingInCatchBlocks" class="findelements.FindLoggingStatementsInCatchSections" text="Find Exception Logs" description="Find logging statements in catch blocks"/>
-            <action id="LogPlugin.FindJavaSources" class="findelements.FindJavaSourceFiles" text="Find Java Sources" description="Find all Java source files"/>
-            <action id="LogPlugin.FindCatchBlocks" class="findelements.FindJavaCatchSections" text="Find Catch Blocks" description="Find all Java catch blocks"/>
+        <group id="LoggingPlugin.LogSearch" text="Search &amp;&amp; Analyze Logging"
+               description="Search and analyze log-related elements" popup="true">
+            <!--<add-to-group group-id="MainMenu" anchor="last"/>-->
+
+            <action id="LoggingPlugin.FindAllLogs" class="findelements.FindLoggingStatements"
+                    text="Search &amp;&amp; Analyze All Logs"
+                    description="Find all the logging statements and analyze their components">
+                <!--<add-to-group group-id="LoggingPlugin.LogSearch"/>-->
+            </action>
+            <action id="LoggingPlugin.FindLoggingInCatchBlocks" class="findelements.FindLoggingStatementsInCatchSections"
+                    text="Search &amp;&amp; Analyze Exception Logs"
+                    description="Find logging statements in catch blocks and analyze their context metrics">
+                <!--<add-to-group group-id="LoggingPlugin.LogSearch"/>-->
+            </action>
+            <action id="LoggingPlugin.FindCatchBlocks" class="findelements.FindJavaCatchSections"
+                    text="Find Catch/Exception Blocks" description="Find all Java catch/exception blocks">
+                <!--<add-to-group group-id="LoggingPlugin.LogSearch"/>-->
+            </action>
+            <action id="LoggingPlugin.FindJavaSources" class="findelements.FindJavaSourceFiles"
+                    text="Find Java Source Files" description="Find all Java source files">
+                <!--<add-to-group group-id="LoggingPlugin.LogSearch"/>-->
+            </action>
+
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
         </group>
 
     </actions>
