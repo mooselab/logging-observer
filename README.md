@@ -25,16 +25,21 @@ You can install the plugin from IDEA's market place, download the package from t
   - Plugin URL: https://plugins.jetbrains.com/plugin/16479-logging-observer
 * Download the plugin from this repository
   - Get the latest version from the path logging-observer-intellij-plugin/build/distributions/
-* Build the *Logging Observer* plugin locally
-  - Configuration
-  - Dependencies
-  - Install
+* Build the plugin locally
+  - Configuration.
+    This plugin uses Gradle for dependecy and build management. Usually you don't need to make any changes to the configuration. In some cases, you may need to config Gradle version (`distributionUrl`) in the file `gradle/wrapper/gradle-wrapper.properties`. You may also need to config the IntelliJ platform (`org.jetbrains.intellij`) version in the `build.gradle` file. 
+  - Dependencies. 
+    This plugin depends on IntelliJ, Intellij Platform SDK, Gradle, SLF4J, Logback, and JUnit.
+  - Build the plugin.
+    - Use Gradle Intellij Plugin: open `Gradle` panel, then run the `build` task.
+    - Use stand-alone Gradle: run `gradle build`.
+    - The built plugin distribution will be in the `logging-observer-intellij-plugin/build/distributions/' folder.
 
 ### Contribution guidelines ###
 
 * Adding more features to the plugin
 * Writing tests
-* Migrate *Logging Observer* to other platforms (e.g., Eclipse, or as a standard-alone tool)
+* Migrate *Logging Observer* to other platforms (e.g., Eclipse, or as a stand-alone tool)
 * Providing coding or feature suggestions
 
 ### Contact ###
