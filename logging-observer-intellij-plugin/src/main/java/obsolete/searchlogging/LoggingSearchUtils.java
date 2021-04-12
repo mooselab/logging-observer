@@ -20,15 +20,15 @@ public class LoggingSearchUtils {
     private static final Logger logger = LoggerFactory.getLogger(SearchLoggingUsages.class);
     /**
      * Find logging statements in a Java project, excluding those in test files
-     * @param project
-     * @return
+     * @param project Java project
+     * @return A list of logging statement as method calls.
      */
     public static List<PsiMethodCallExpression> findLoggingStatementsInProject(Project project) {
         // find all occurences of "Logger"
         //List<PsiElement> elements = new ArrayList<>();
 
         List<PsiMethodCallExpression> loggingStatements = new ArrayList<>();
-        PsiSearchHelper.SERVICE.getInstance(project).processElementsWithWord(
+        PsiSearchHelper.getInstance(project).processElementsWithWord(
                 (psiElement, offsetInElement) -> {
                     if (psiElement instanceof PsiTypeElement) {
                         // exclude test files

@@ -2,11 +2,56 @@
     <id>org.mooselab.logging-observer</id>
     <name>Logging Observer</name>
     <version>1.0</version>
-    <vendor email="moose.researchlab@gmail.com" url="hengli.org">SAIL &amp; MOOSE Labs</vendor>
+    <vendor email="moose.researchlab@gmail.com" url="https://www.hengli.org/research/">MOOSE Lab</vendor>
 
     <description><![CDATA[
-    Plugin for logging search and analysis.<br>
-    <em>A research project.</em>
+    <p>Logging Observer is an IntelliJ IDEA plugin for searching and analyzing logging code in Java projects.</p>
+
+    <h2>What does Logging Observer provide?</h2>
+    <ul>
+    <li>Searching logging-related elements in a Java project.<br>
+    <ul>
+    <li>Searching all logging statements in the project.</li>
+    <li>Searching all exception logging statements (logging statements in catch blocks).</li>
+    <li>etc.</li>
+    </ul>
+    </li>
+    <li>Analyzing logging code.<br>
+    <ul>
+    <li>Analyzing logging components (e.g., log level, text, variables, stack traces)</li>
+    <li>Analyzing logging-related code metrics (e.g., exception type, containing code blocks)</li>
+    <li>etc.</li>
+    </ul>
+    </li>
+    <li>More to come ...</li>
+    </ul>
+
+    <h2>How to use Logging Observer?</h2>
+    <h3>Perform actions</h3>
+    <p>The features of the plugin are packaged into a menu item <em>Search & Analyze Logging</em> under the <em>Tools</em> menu.
+    There are currnetly four <em>actions</em> in the menu item.
+    You can click each <em>action</em> to perform the corresponding operation.</p>
+
+    <h3>View search results</h3>
+    <p>After performing an action (e.g, <em>Search & Analyze All Logs</em>),
+    there will be a few seconds to a few minutes of waiting time depending on the size of the project and the performed action,
+    then the search results will be displayed in the <em>Find</em> tool window usually in the lower left part of IntelliJ's UI.</p>
+
+    <p>You can browse and click a searched item.
+    When a searched item is clicked,
+    the source file containing the searched item will be displayed with the searched item highlighted in the file.</p>
+
+    <h3>View analysis results</h3>
+    <p>The analysis results are stored in the form of IntelliJ's log files. You can access the log files through the <em>Show Log in Finder</em> action in the <em>Help</em> menu.</p>
+
+    <p>In the current version, when you perform action <em>Search & Analyze All Logs</em>, the analysis results will show a list of logging statements.
+    For each logging statement, the results will include its source code location, the logging statement itself, and its components (log level and message string).
+    The results start after the log message <em>Logging components for project ...</em>. </p>
+
+    <p>When you perform action <em>Search & Analyze Exception Logs</em>, the analysis results will show a list of exception logging statements.
+    For each exception logging statement, the results will include a list of context code metrics associated with the logging statement (e.g., exception type, containing package, etc.).
+    The results start after the log message <em>Exception logging metrics for project...</em>.</p>
+
     ]]></description>
 
     <change-notes>Initial release</change-notes>
