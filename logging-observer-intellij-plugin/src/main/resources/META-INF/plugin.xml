@@ -5,7 +5,7 @@
     <vendor email="moose.researchlab@gmail.com" url="https://www.hengli.org/research/">MOOSE Lab</vendor>
 
     <description><![CDATA[
-    <p>Logging Observer is an IntelliJ IDEA plugin for searching and analyzing logging code in Java projects.</p>
+    <p>Logging Observer is an IntelliJ-based IDEA plugin for searching and analyzing logging code in Java projects.</p>
 
     <h2>What does Logging Observer provide?</h2>
     <ul>
