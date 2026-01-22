@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>org.mooselab.logging-observer</id>
     <name>Logging Observer</name>
-    <version>1.0</version>
-    <vendor email="moose.researchlab@gmail.com" url="https://www.hengli.org/research/">MOOSE Lab</vendor>
+    <version>2.0</version>
+    <vendor email="moose.researchlab@gmail.com" url="https://moose.polymtl.ca/">MOOSE Lab</vendor>
 
     <description><![CDATA[
     <p>Logging Observer is an IntelliJ-based IDEA plugin for searching and analyzing logging code in Java projects.</p>
@@ -54,7 +54,7 @@
 
     ]]></description>
 
-    <change-notes>Initial release</change-notes>
+    <change-notes>Second release</change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->

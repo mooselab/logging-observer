@@ -1,29 +1,77 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.7.2'
+    id 'java'
+    id 'org.jetbrains.intellij.platform' version '2.10.5'
+    //id 'org.jetbrains.intellij.platform.migration' version '2.10.5'
 }
 
 group 'org.mooselab'
-version '1.0-SNAPSHOT'
+version '2.0-SNAPSHOT'
 
-apply plugin: 'java'
+//apply plugin: 'java'
 
 repositories {
     mavenCentral()
+
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
+
+
 dependencies {
+
+    intellijPlatform {
+        intellijIdea '2025.3.1.1'
+
+        bundledPlugin 'com.intellij.java'
+    }
+
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.9'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    //implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.25'
+    //testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
+/*intellij {
     version '2020.3.2'
     plugins = ['com.intellij.java']
 }
+*/
+
+intellijPlatform {
+    pluginConfiguration {
+        id = 'org.mooselab.logging-observer'
+        name = 'Logging Observer'
+        version = '2.0.0'
+        description = 'Logging Observer is an IntelliJ-based IDEA plugin for searching and analyzing logging code in Java projects.'
+        changeNotes =
+                """
+      The new version is compitable with the IntelliJ Platform Gradle Plugin 2.0 and supports Java 17. 
+      """.stripIndent()
+
+        /*productDescriptor {
+            // ...
+        }
+        */
+        /*ideaVersion {
+            // ...
+        }
+        */
+        /*vendor {
+            // ...
+        }
+        */
+    }
+
+ }
+
+
+/*
 patchPluginXml {
     changeNotes """
       Initial version of the plugin. Features include:<br>
@@ -35,6 +83,7 @@ patchPluginXml {
       </ol>
       """
 }
+*/
 
 test {
     useJUnitPlatform()
