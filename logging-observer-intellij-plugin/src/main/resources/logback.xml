@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration debug="false">
 
-    <property name="LOG_DIR" value = "/Users/hengli/Projects/ideaplugins/logging-plugins/log" />
+    <!--<property name="LOG_DIR" value = "/Users/hengli/Projects/ideaplugins/logging-plugins/log" />-->
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
@@ -12,7 +12,8 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${LOG_DIR}/logging-plugins.log</file>
+        <!--<file>${LOG_DIR}/logging_observer_plugin.log</file>-->
+        <file>${idea.log.path}/logging_observer_plugin.log</file>
         <encoder>
             <pattern>%date %-5level %logger{36} - %msg%n</pattern>
         </encoder>

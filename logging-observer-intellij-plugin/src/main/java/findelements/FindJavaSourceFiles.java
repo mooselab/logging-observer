@@ -14,6 +14,7 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +22,14 @@ import java.util.stream.Collectors;
 
 public class FindJavaSourceFiles extends AnAction {
     private static final Logger logger = Logger.getInstance(FindJavaSourceFiles.class);
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindJavaSourceFiles.class);
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) return;
         String projectName = project.getName();
-        logger.info("Start to find Java source files in project " + projectName +".");
+        logger.info("Start to find Java source files in project " + projectName);
 
         List<PsiFile> psiFiles = findJavaSourceFilesInProject(project);
 
@@ -75,6 +77,8 @@ public class FindJavaSourceFiles extends AnAction {
                 return true;
             }
         });
+
+        logger.info("The number of Java source files is: " + psiFiles.size());
 
         return psiFiles;
     }

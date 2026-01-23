@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import findelements.FindLoggingStatements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import common.Locators;
 
 public class LoggingComponents {
     private static final Logger logger = LoggerFactory.getLogger(LoggingComponents.class);
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(LoggingComponents.class);
 
     private PsiMethodCallExpression logStmt;
     String logLevel;
@@ -46,9 +48,9 @@ public class LoggingComponents {
         componentsHeader.add("logLocation");
         componentsHeader.add("logBody");
         componentsHeader.add("logLevel");
-        //componentsHeader.add("logStringWithoutVariables");
+        componentsHeader.add("logStringWithoutVariables");
         componentsHeader.add("logStringWithVariableNames");
-        //componentsHeader.add("logStringWithVariableTypes");
+        componentsHeader.add("logStringWithVariableTypes");
 
         return String.join(";;;", componentsHeader);
     }
@@ -59,9 +61,9 @@ public class LoggingComponents {
         logComponents.add(Locators.getLocationInFile(this.logStmt));
         logComponents.add(getLogBody());
         logComponents.add(getLogLevel());
-        //logComponents.add(getLogStringWithoutVariables().replaceAll("\\r\\n|\\r|\\n", " "));
+        logComponents.add(getLogStringWithoutVariables().replaceAll("\\r\\n|\\r|\\n", " "));
         logComponents.add(getLogStringWithVariableNames().replaceAll("\\r\\n|\\r|\\n", " "));
-        //logComponents.add(getLogStringWithVariableTypes().replaceAll("\\r\\n|\\r|\\n", " "));
+        logComponents.add(getLogStringWithVariableTypes().replaceAll("\\r\\n|\\r|\\n", " "));
 
         return String.join(";;;", logComponents);
     }
@@ -103,6 +105,8 @@ public class LoggingComponents {
     private String extractLogStringWithoutVariables(PsiMethodCallExpression logStmt) {
         PsiExpressionList expressionList = logStmt.getArgumentList();
         int argCount = expressionList.getExpressionCount();
+        //logger.info("logStmt: " + logStmt.getText() + "; argCount " + argCount);
+        if (argCount == 0) {return "";}
 
         StringBuilder logString = new StringBuilder();
         boolean isFirstArg = true;
@@ -162,6 +166,7 @@ public class LoggingComponents {
     private String extractLogStringWithVariableNames(PsiMethodCallExpression logStmt) {
         PsiExpressionList expressionList = logStmt.getArgumentList();
         int argCount = expressionList.getExpressionCount();
+        if (argCount == 0) {return "";}
 
         StringBuilder logString = new StringBuilder();
         boolean isFirstArg = true;
@@ -270,6 +275,7 @@ public class LoggingComponents {
     private String extractLogStringWithVariableTypes(PsiMethodCallExpression logStmt) {
         PsiExpressionList expressionList = logStmt.getArgumentList();
         int argCount = expressionList.getExpressionCount();
+        if (argCount == 0) {return "";}
 
         StringBuilder logString = new StringBuilder();
         boolean isFirstArg = true;

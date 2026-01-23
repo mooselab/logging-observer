@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import loggingcomponents.LoggingComponents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,30 +21,34 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class FindLoggingStatements extends AnAction {
-    private static final Logger logger = Logger.getInstance(FindJavaSourceFiles.class);
+    private static final Logger logger = Logger.getInstance(FindLoggingStatements.class);
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindLoggingStatements.class);
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) return;
+
         String projectName = project.getName();
-        logger.info("Start to find logging statements in project " + projectName +".");
+        logger.info("Start to find logging statements in project " + projectName);
 
         // find all logging statements in the project
         List<PsiMethodCallExpression> loggingStatements = findLoggingStatementsInFiles(project);
 
-        /*
         StringBuilder loggingStatementsStr = new StringBuilder();
+
+        /*
         loggingStatementsStr.append("Logging statements in Project " + project.getName() + ":\n");
 
         for (PsiMethodCallExpression loggingStatement : loggingStatements) {
             loggingStatementsStr.append(loggingStatement.getText()).append("\n");
         }
+
         logger.info(loggingStatementsStr.toString());
-        */
+       */
 
         // get the logging components of each logging statement
-        StringBuilder loggingStatementsStr = new StringBuilder();
+
         loggingStatementsStr.append(LoggingComponents.getLogComponentsHeader()).append("\n");
         for (PsiMethodCallExpression log : loggingStatements) {
             // get the components of the logging statement
@@ -52,6 +57,7 @@ public class FindLoggingStatements extends AnAction {
             //loggingStatementsStr.append("Logging:").append("\n").append(metrics.getLogBody()).append("\n\n");
             loggingStatementsStr.append(metrics.getLogComponents()).append("\n");
         }
+
         logger.info("Logging components for project " + projectName + ":\n" + loggingStatementsStr);
 
         // list the logging statements in the find tool window view
@@ -90,6 +96,7 @@ public class FindLoggingStatements extends AnAction {
                     PsiTreeUtil.findChildrenOfType(psiFile, PsiMethodCallExpression.class).forEach(m -> {
                         if (pLog.matcher(m.getMethodExpression().getText()).matches()) {
                             loggingStatements.add(m);
+                            //logger.info("psiFile's child PsiMethodCallExpression matching log pattern: " + m.getMethodExpression().getText());
                         }
                     });
 
@@ -97,6 +104,8 @@ public class FindLoggingStatements extends AnAction {
                 return true;
             }
         });
+
+        logger.info("The number of identified logging statements is " + loggingStatements.size());
 
         return loggingStatements;
     }

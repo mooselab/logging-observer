@@ -51,7 +51,7 @@ intellijPlatform {
         description = 'Logging Observer is an IntelliJ-based IDEA plugin for searching and analyzing logging code in Java projects.'
         changeNotes =
                 """
-      The new version is compitable with the IntelliJ Platform Gradle Plugin 2.0 and supports Java 17. 
+      The new version is compitable with the IntelliJ Platform Gradle Plugin 2.0 and supports Java 21. 
       """.stripIndent()
 
         /*productDescriptor {

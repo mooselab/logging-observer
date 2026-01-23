@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import exceptionloggingmetrics.ExceptionLoggingMetrics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,20 +22,22 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class FindLoggingStatementsInCatchSections extends AnAction {
-    private static final Logger logger = Logger.getInstance(FindJavaSourceFiles.class);
+    private static final Logger logger = Logger.getInstance(FindLoggingStatementsInCatchSections.class);
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindLoggingStatementsInCatchSections.class);
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) return;
         String projectName = project.getName();
-        logger.info("Start to find logging statements in catch sections in project " + projectName +".");
+        logger.info("Start to find logging statements in catch sections in project " + projectName);
 
         // find exception logging statements in the project
         List<PsiMethodCallExpression> loggingStatements = findLoggingStatementsInCatchSections(project);
 
-        /*
         StringBuilder loggingStatementsStr = new StringBuilder();
+
+        /*
         loggingStatementsStr.append("Logging statements in catch sections in Project " + project.getName() + ":\n");
 
         for (PsiMethodCallExpression loggingStatement : loggingStatements) {
@@ -43,7 +46,6 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
         logger.info(loggingStatementsStr.toString());
         */
 
-        StringBuilder loggingStatementsStr = new StringBuilder();
         loggingStatementsStr.append(ExceptionLoggingMetrics.getLoggingMetricsHeader()).append(("\n"));
         for (PsiMethodCallExpression log : loggingStatements) {
             ExceptionLoggingMetrics metrics = new ExceptionLoggingMetrics(log);
@@ -93,6 +95,7 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
                         PsiTreeUtil.findChildrenOfType(catchSection, PsiMethodCallExpression.class).forEach(m -> {
                             if (pLog.matcher(m.getMethodExpression().getText()).matches()) {
                                 loggingStatements.add(m);
+                                //logger.info("catchSection's child PsiMethodCallExpression matching log pattern: " + m.getMethodExpression().getText());
                             }
                         });
                     }
@@ -100,6 +103,8 @@ public class FindLoggingStatementsInCatchSections extends AnAction {
                 return true;
             }
         });
+
+        logger.info("The number of identified logging statements is " + loggingStatements.size());
 
         return loggingStatements;
     }

@@ -6,13 +6,15 @@ import com.intellij.usageView.UsageInfo;
 import com.intellij.usages.*;
 
 import com.intellij.openapi.diagnostic.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FindElementsUtils {
 
-    private static final Logger logger = Logger.getInstance(FindJavaSourceFiles.class);
+    private static final Logger logger = Logger.getInstance(FindElementsUtils.class);
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindElementsUtils.class);
 
     /**
      * Show a list of Psi elements in the find tool window

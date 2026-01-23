@@ -13,6 +13,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,14 +21,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FindJavaCatchSections extends AnAction {
-    private static final Logger logger = Logger.getInstance(FindJavaSourceFiles.class);
+    private static final Logger logger = Logger.getInstance(FindJavaCatchSections.class);
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindJavaCatchSections.class);
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent event) {
         Project project = event.getProject();
         if (project == null) return;
         String projectName = project.getName();
-        logger.info("Start to find Java catch sections in project " + projectName +".");
+        logger.info("Start to find Java catch sections in project " + projectName);
 
         List<PsiCatchSection> psiCatchSections = findCatchSectionsInJavaProject(project);
 
@@ -49,7 +51,7 @@ public class FindJavaCatchSections extends AnAction {
             catchInfoStr.append(catchLogInfo.getCatchSectionLoggingInfo()).append("\n");
         }
 
-        logger.info("Catch section log info for project " + projectName + ": \n" + catchInfoStr);
+        logger.info("Catch section log info for project " + projectName + ":\n" + catchInfoStr);
 
         // list all the searched items in the find tool window view
         FindElementsUtils.listPsiElementsInFindToolWindow(project,
@@ -91,6 +93,8 @@ public class FindJavaCatchSections extends AnAction {
                 return true;
             }
         });
+
+        logger.info("The number of Catch sections is: " + catchSections.size());
 
         return catchSections;
     }
